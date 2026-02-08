@@ -1,0 +1,14 @@
+<!-- Fixed stat badges — desktop only, bottom-right corner -->
+<!-- GSAP animates these in after 1.5s, then morphs them into the stats section -->
+<div id="stat-badges-container" class="hidden lg:block" aria-hidden="true">
+  {% for stat in site.data.stats %}
+  <div class="stat-badge-item fixed z-40 pointer-events-none opacity-0"
+       data-badge-index="{{ forloop.index0 }}"
+       style="bottom: {{ forloop.index0 | times: 56 | plus: 32 }}px; right: 32px;">
+    <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-bg-elevated/90 backdrop-blur-md border border-border/50">
+      <span class="text-lg font-200 text-text-primary">{{ stat.value }}<span class="text-emerald text-sm">{{ stat.suffix }}</span></span>
+      <span class="text-[10px] uppercase tracking-wider text-text-muted font-500">{{ stat.label }}</span>
+    </div>
+  </div>
+  {% endfor %}
+</div>

@@ -1,62 +1,76 @@
-- name: "CloudSync Platform"
-  description: "Real-time data synchronization platform for distributed teams. Handles conflict resolution and offline-first workflows."
+- name: "Transcribber"
+  short: "Transcribber"
+  description: "AI-powered transcription app that captures meetings in real time and delivers concise, actionable summaries."
+  category: "Productivity"
   tech:
-    - React
-    - Node.js
-    - PostgreSQL
-    - WebSocket
+    - Xcode
+    - Whisper model
   link: "#"
+  gradient_from: "#064e3b"
+  gradient_to: "#0d9488"
+  icon: "sync"
 
-- name: "PayFlow"
-  description: "Automated invoicing and payment processing SaaS. Supports multi-currency transactions and recurring billing."
+- name: "Foundation Flow"
+  short: "Foundation Flow"
+  description: "End-to-end fire safety compliance platform for building assets. Web portal and mobile app with full offline audit capability."
+  category: "SaaS"
   tech:
     - Next.js
-    - Stripe API
-    - TypeScript
-    - Redis
+    - React
+    - Flutter
   link: "#"
+  gradient_from: "#1e1b4b"
+  gradient_to: "#6366f1"
+  icon: "payment"
 
 - name: "DevMetrics Dashboard"
+  short: "DevMetrics"
   description: "Engineering productivity analytics tool. Tracks deployment frequency, lead time, and DORA metrics."
+  category: "Developer Tools"
   tech:
     - Vue.js
     - Python
     - Grafana
     - Docker
   link: "#"
+  gradient_from: "#172554"
+  gradient_to: "#3b82f6"
+  icon: "chart"
 
 - name: "SecureVault"
+  short: "SecureVault"
   description: "Enterprise-grade secrets management solution with role-based access control and audit logging."
+  category: "Enterprise Security"
   tech:
     - Go
     - AWS KMS
     - Terraform
     - gRPC
   link: "#"
+  gradient_from: "#1c1917"
+  gradient_to: "#a16207"
+  icon: "shield"
 
 - name: "ShipFast CI"
+  short: "ShipFast CI"
   description: "Opinionated CI/CD pipeline builder for startups. From commit to production in under five minutes."
+  category: "DevOps"
   tech:
     - Rust
     - GitHub Actions
     - Docker
     - Kubernetes
   link: "#"
+  gradient_from: "#450a0a"
+  gradient_to: "#ef4444"
+  icon: "rocket"
 
-- name: "DataLens"
-  description: "Business intelligence tool for non-technical users. Drag-and-drop report builder with natural language queries."
-  tech:
-    - React
-    - Python
-    - OpenAI API
-    - Snowflake
+- name: "All Work"
+  short: "All Work"
+  description: "Explore our complete portfolio of products spanning analytics, form builders, e-commerce platforms, and more."
+  category: "Portfolio"
+  tech: []
   link: "#"
-
-- name: "FormForge"
-  description: "Dynamic form builder with conditional logic, integrations, and analytics. Embeddable in any web application."
-  tech:
-    - Svelte
-    - TypeScript
-    - Supabase
-    - Tailwind CSS
-  link: "#"
+  gradient_from: "#052e16"
+  gradient_to: "#10B981"
+  icon: "all"
