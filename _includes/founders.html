@@ -1,31 +1,33 @@
-<section id="founders" class="py-20 md:py-28 bg-bg-alt">
-  <div class="max-w-5xl mx-auto px-4 md:px-6 lg:px-8">
+<section id="founders" class="slide relative bg-bg flex flex-col justify-center">
+  <div class="max-w-[1400px] mx-auto px-6 md:px-10 lg:px-16 w-full">
 
-    <div class="text-center max-w-2xl mx-auto mb-14 animate-on-scroll">
-      <p class="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Our Team</p>
-      <h2 class="font-heading font-bold text-2xl md:text-3xl lg:text-4xl text-text-heading">
-        Meet the Founders
+    <!-- Section header -->
+    <div class="reveal text-center mb-14 md:mb-20">
+      <span class="text-xs font-medium uppercase tracking-[0.2em] text-emerald mb-4 block">Our Team</span>
+      <h2 class="font-serif text-4xl md:text-5xl lg:text-6xl text-text-primary">
+        Meet the <span class="italic text-text-secondary">founders</span>
       </h2>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-10 stagger-children">
+    <!-- Founders grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8 max-w-4xl mx-auto stagger">
       {% for founder in site.data.founders %}
-      <div class="animate-on-scroll text-center group">
-        <!-- CSS Initials Avatar -->
-        <div class="relative mx-auto mb-6 w-28 h-28 md:w-32 md:h-32">
-          <div class="w-full h-full rounded-full flex items-center justify-center text-white font-heading font-bold text-2xl md:text-3xl shadow-lg transition-transform duration-300 group-hover:scale-105
-            {% if forloop.index == 1 %}bg-avatar-1{% elsif forloop.index == 2 %}bg-avatar-2{% else %}bg-avatar-3{% endif %}">
+      <div class="reveal founder-card text-center p-8 md:p-10 rounded-2xl border border-border bg-bg-card group">
+        <!-- Avatar -->
+        <div class="relative mx-auto mb-6 w-20 h-20 md:w-24 md:h-24">
+          <div class="w-full h-full rounded-full flex items-center justify-center text-base md:text-lg font-medium tracking-wider
+            {% if forloop.index == 1 %}bg-emerald/15 text-emerald border border-emerald/20
+            {% elsif forloop.index == 2 %}bg-amber-500/15 text-amber-400 border border-amber-500/20
+            {% else %}bg-cyan-500/15 text-cyan-400 border border-cyan-500/20{% endif %}
+            transition-transform duration-300 group-hover:scale-105">
             {{ founder.initials }}
           </div>
-          <div class="absolute -inset-1 rounded-full border-2 border-dashed opacity-30 transition-opacity duration-300 group-hover:opacity-60
-            {% if forloop.index == 1 %}border-avatar-1{% elsif forloop.index == 2 %}border-avatar-2{% else %}border-avatar-3{% endif %}"
-            aria-hidden="true"></div>
         </div>
 
-        <h3 class="font-heading font-semibold text-lg text-text-heading">
+        <h3 class="text-lg font-semibold text-text-primary">
           {{ founder.name }}
         </h3>
-        <p class="mt-1 text-sm text-text-light">
+        <p class="mt-2 text-sm text-text-tertiary uppercase tracking-wider">
           {{ founder.role }}
         </p>
       </div>

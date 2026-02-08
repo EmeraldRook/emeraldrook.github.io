@@ -1,41 +1,73 @@
-<section id="hero" class="relative min-h-screen flex items-center justify-center bg-bg-hero pt-16 overflow-hidden">
-  <!-- Decorative blobs -->
-  <div class="blob w-[500px] h-[500px] bg-primary-light/30 -top-40 -right-40" aria-hidden="true"></div>
-  <div class="blob w-[400px] h-[400px] bg-accent-light/20 bottom-20 -left-32" aria-hidden="true"></div>
-  <div class="blob w-[300px] h-[300px] bg-primary/20 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" aria-hidden="true"></div>
+<section id="hero" class="slide relative flex flex-col justify-center hero-gradient noise">
+  <!-- Ambient glow orbs -->
+  <div class="absolute top-[-20%] left-[50%] translate-x-[-50%] w-[800px] h-[600px] rounded-full bg-emerald/[0.07] blur-[120px] pointer-events-none" aria-hidden="true"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-emerald/[0.04] blur-[100px] pointer-events-none" aria-hidden="true"></div>
 
-  <div class="relative max-w-4xl mx-auto px-4 md:px-6 lg:px-8 text-center">
+  <!-- Grid lines decoration -->
+  <div class="absolute inset-0 pointer-events-none opacity-[0.03]" aria-hidden="true">
+    <div class="absolute top-0 left-[25%] w-px h-full bg-text-primary"></div>
+    <div class="absolute top-0 left-[50%] w-px h-full bg-text-primary"></div>
+    <div class="absolute top-0 left-[75%] w-px h-full bg-text-primary"></div>
+  </div>
 
-    <h1 class="font-heading font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-text-heading tracking-tight animate-on-scroll">
-      We are <span class="emerald-svg-filter">{{ site.company_name }}</span>
-    </h1>
+  <div class="relative z-10 max-w-[1400px] mx-auto px-6 md:px-10 lg:px-16 w-full">
+    <!-- Eyebrow -->
+    <div class="reveal mb-6 md:mb-8">
+      <div class="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-border bg-bg-elevated/50 backdrop-blur-sm">
+        <span class="w-2 h-2 rounded-full bg-emerald animate-pulse"></span>
+        <span class="text-xs font-medium uppercase tracking-[0.2em] text-text-secondary">{{ site.company_tagline | truncatewords: 6 }}</span>
+      </div>
+    </div>
 
-    <!-- Inline SVG filter: turbulence + specular with animated shimmer sweep -->
+    <!-- SVG filter: turbulence + specular with animated shimmer sweep -->
     <svg width="0" height="0" aria-hidden="true" style="position:absolute">
       <filter id="emerald-stone-filter">
         <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" seed="2" result="noise" />
-        <feSpecularLighting in="noise" surfaceScale="6" specularConstant="1.2" specularExponent="20" lighting-color="#6EE7B7" result="specular">
+        <feSpecularLighting in="noise" surfaceScale="7.2" specularConstant="1.45" specularExponent="24" lighting-color="#6EE7B7" result="specular">
           <fePointLight x="-200" y="-200" z="300">
             <animate attributeName="x" values="-200;600;-200" dur="3s" repeatCount="indefinite" />
           </fePointLight>
         </feSpecularLighting>
         <feComposite in="specular" in2="SourceAlpha" operator="in" result="lit" />
-        <feComposite in="SourceGraphic" in2="lit" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" />
+        <feComposite in="SourceGraphic" in2="lit" operator="arithmetic" k1="0" k2="1" k3="1.2" k4="0" />
       </filter>
     </svg>
 
-    <p class="mt-6 text-lg md:text-xl text-text-light max-w-2xl mx-auto leading-relaxed font-bold animate-on-scroll">
-      Rare by design.
-    </p>
+    <!-- Main headline -->
+    <h1 class="reveal">
+      <span class="block font-serif text-[clamp(2.5rem,6vw,6rem)] leading-[0.95] tracking-[-0.02em] text-text-primary">
+        We craft
+      </span>
+      <span class="block font-serif italic text-[clamp(2.5rem,6vw,6rem)] leading-[0.95] tracking-[-0.02em] emerald-stone-text">
+        software
+      </span>
+      <span class="block font-serif text-[clamp(2.5rem,6vw,6rem)] leading-[0.95] tracking-[-0.02em] text-text-primary">
+        that moves.
+      </span>
+    </h1>
 
-    <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-on-scroll">
-      <a href="#projects" class="inline-flex items-center gap-2 px-8 py-4 bg-cta hover:bg-cta-hover text-white font-medium rounded-xl transition-colors duration-200 cursor-pointer shadow-lg hover:shadow-xl focus-ring">
+    <!-- Subtext -->
+    <div class="reveal mt-6 md:mt-8 max-w-xl">
+      <p class="text-lg md:text-xl font-light leading-relaxed text-text-secondary">
+        {{ site.company_tagline }}
+      </p>
+    </div>
+
+    <!-- CTAs -->
+    <div class="reveal mt-6 md:mt-8 flex flex-col sm:flex-row items-start gap-4">
+      <a href="#projects" class="btn-primary text-base inline-flex items-center gap-2">
         View Our Work
-        {% include icons/chevron-down.html %}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
       </a>
-      <a href="#contact" class="inline-flex items-center gap-2 px-8 py-4 bg-bg-card hover:bg-bg border border-border text-text-heading font-medium rounded-xl transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md focus-ring">
+      <a href="#contact" class="btn-outline text-base inline-flex items-center gap-2">
         Get In Touch
       </a>
     </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="reveal absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+    <span class="text-[11px] font-medium uppercase tracking-[0.2em] text-text-muted">Scroll</span>
+    <div class="w-px h-8 bg-gradient-to-b from-text-muted to-transparent"></div>
   </div>
 </section>

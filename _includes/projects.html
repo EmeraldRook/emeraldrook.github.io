@@ -1,48 +1,248 @@
-<section id="projects" class="py-20 md:py-28 lg:py-32 bg-bg">
-  <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+<section id="projects" class="slide relative bg-bg">
 
-    <div class="text-center max-w-3xl mx-auto mb-16 md:mb-20 animate-on-scroll">
-      <p class="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Our Work</p>
-      <h2 class="font-heading font-bold text-3xl md:text-4xl lg:text-5xl text-text-heading">
-        Projects We've Built
-      </h2>
-      <p class="mt-4 text-text-light text-lg max-w-2xl mx-auto">
+  <!-- Background gradient layer — changes per project -->
+  <div id="project-bg" class="absolute inset-0 transition-all duration-700 ease-out opacity-40" style="background: radial-gradient(ellipse 80% 60% at 70% 50%, {{ site.data.projects[0].gradient_from }} 0%, transparent 70%);"></div>
+
+  <div class="relative z-10 max-w-[1400px] mx-auto px-6 md:px-10 lg:px-16 h-full flex flex-col justify-center py-16 md:py-20">
+
+    <!-- Section header -->
+    <div class="reveal flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8 md:mb-12">
+      <div>
+        <span class="text-xs font-medium uppercase tracking-[0.2em] text-emerald mb-3 block">Selected Work</span>
+        <h2 class="font-serif text-3xl md:text-4xl lg:text-5xl text-text-primary leading-[1.1]">
+          Projects we've<br>
+          <span class="italic text-text-secondary">brought to life</span>
+        </h2>
+      </div>
+      <p class="text-text-secondary text-sm md:text-base max-w-md leading-relaxed font-light">
         From SaaS platforms to enterprise tools, we deliver software that solves real problems.
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 stagger-children">
-      {% for project in site.data.projects %}
-      <div class="animate-on-scroll group bg-bg-card border border-border rounded-2xl p-6 md:p-8 card-hover hover:border-border-hover cursor-pointer flex flex-col{% if forloop.index == 7 %} md:col-span-2 lg:col-span-1{% endif %}">
+    <!-- Interactive showcase: left list + right preview -->
+    <div class="reveal flex flex-col lg:flex-row gap-6 lg:gap-12 flex-1 min-h-0">
 
-        <div class="w-10 h-10 rounded-xl bg-primary-soft flex items-center justify-center mb-5 group-hover:bg-primary group-hover:text-white text-primary transition-colors duration-250">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
-        </div>
-
-        <h3 class="font-heading font-semibold text-xl text-text-heading group-hover:text-primary transition-colors duration-200">
-          {{ project.name }}
-        </h3>
-
-        <p class="mt-3 text-text-light leading-relaxed flex-grow">
-          {{ project.description }}
-        </p>
-
-        <div class="mt-5 flex flex-wrap gap-2">
-          {% for tech in project.tech %}
-          <span class="inline-block px-3 py-1 text-xs font-medium bg-tag-bg text-tag-text rounded-full">
-            {{ tech }}
-          </span>
+      <!-- LEFT: Project list -->
+      <div class="lg:w-[40%] flex flex-col overflow-y-auto min-h-0">
+        <div class="flex flex-col" id="project-list">
+          {% for project in site.data.projects %}
+          <a href="{{ project.link }}"
+             class="project-item group flex items-center justify-between py-3 md:py-4 border-b border-border cursor-pointer transition-all duration-300{% if forloop.first %} is-active{% endif %}"
+             data-index="{{ forloop.index0 }}"
+             data-gradient-from="{{ project.gradient_from }}"
+             data-gradient-to="{{ project.gradient_to }}">
+            <div class="flex items-center gap-4 md:gap-5">
+              <span class="text-sm font-mono text-text-muted group-hover:text-emerald transition-colors duration-300 w-6">
+                {% if forloop.index < 10 %}0{% endif %}{{ forloop.index }}
+              </span>
+              <div>
+                <h3 class="font-serif text-lg md:text-xl lg:text-2xl text-text-secondary group-hover:text-text-primary transition-colors duration-300 project-item-name">
+                  {{ project.short }}
+                </h3>
+                <span class="text-[10px] uppercase tracking-wider text-text-muted mt-0.5 block">{{ project.category }}</span>
+              </div>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-text-muted group-hover:text-emerald transition-all duration-300 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0">
+              <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+            </svg>
+          </a>
           {% endfor %}
         </div>
-
-        <div class="mt-6 pt-4 border-t border-border">
-          <a href="{{ project.link }}" class="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-dark transition-colors duration-200 cursor-pointer focus-ring">
-            View Project
-            {% include icons/external-link.html %}
-          </a>
-        </div>
       </div>
-      {% endfor %}
+
+      <!-- RIGHT: Project preview -->
+      <div class="lg:w-[60%] relative flex items-center justify-center min-h-0" id="project-preview-area">
+
+        {% for project in site.data.projects %}
+        <div class="project-preview absolute inset-0 flex flex-col items-center justify-center transition-all duration-500{% if forloop.first %} opacity-100 scale-100{% else %} opacity-0 scale-95 pointer-events-none{% endif %}"
+             data-index="{{ forloop.index0 }}">
+
+          <!-- Background mockup: browser/app frame -->
+          <div class="relative w-full max-w-md mx-auto">
+            <!-- Background glow -->
+            <div class="absolute inset-0 rounded-3xl blur-[60px] opacity-30" style="background: linear-gradient(135deg, {{ project.gradient_from }}, {{ project.gradient_to }});"></div>
+
+            <!-- Device frame -->
+            <div class="relative bg-bg-card border border-border rounded-2xl overflow-hidden shadow-2xl">
+              <!-- Browser bar -->
+              <div class="flex items-center gap-2 px-4 py-2.5 bg-bg-elevated border-b border-border">
+                <div class="flex gap-1.5">
+                  <div class="w-2.5 h-2.5 rounded-full bg-red-500/60"></div>
+                  <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/60"></div>
+                  <div class="w-2.5 h-2.5 rounded-full bg-green-500/60"></div>
+                </div>
+                <div class="flex-1 mx-4">
+                  <div class="bg-bg rounded-md px-3 py-1 text-xs text-text-muted text-center">{{ project.short | downcase }}.app</div>
+                </div>
+              </div>
+
+              <!-- App content area — unique SVG per project -->
+              <div class="p-5 md:p-6 aspect-[4/3] flex flex-col justify-between" style="background: linear-gradient(160deg, {{ project.gradient_from }}33, {{ project.gradient_to }}1a);">
+
+                {% if project.icon == "sync" %}
+                <div class="space-y-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: {{ project.gradient_to }}33;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{{ project.gradient_to }}" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+                    </div>
+                    <div class="text-sm font-semibold text-text-primary">Real-time Sync</div>
+                  </div>
+                  <div class="grid grid-cols-3 gap-2">
+                    <div class="h-16 rounded-lg bg-white/[0.04] border border-white/[0.06]"></div>
+                    <div class="h-16 rounded-lg bg-white/[0.06] border border-white/[0.08]"></div>
+                    <div class="h-16 rounded-lg bg-white/[0.04] border border-white/[0.06]"></div>
+                  </div>
+                  <div class="h-2.5 w-3/4 rounded bg-white/[0.06]"></div>
+                  <div class="h-2.5 w-1/2 rounded bg-white/[0.04]"></div>
+                </div>
+                <div class="flex gap-2 mt-3">
+                  <div class="h-7 px-3 rounded-full text-xs flex items-center font-medium" style="background: {{ project.gradient_to }}44; color: {{ project.gradient_to }};">Connected</div>
+                  <div class="h-7 px-3 rounded-full bg-white/[0.05] text-xs flex items-center text-text-muted">3 devices</div>
+                </div>
+
+                {% elsif project.icon == "payment" %}
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div class="text-sm font-semibold text-text-primary">Invoice #1042</div>
+                    <div class="h-5 px-2.5 rounded-full text-[10px] flex items-center font-medium" style="background: {{ project.gradient_to }}33; color: {{ project.gradient_to }};">Paid</div>
+                  </div>
+                  <div class="text-2xl font-light text-text-primary">$4,280<span class="text-sm text-text-muted">.00</span></div>
+                  <div class="space-y-2">
+                    <div class="flex justify-between text-xs text-text-muted"><span>Design sprint</span><span>$2,400</span></div>
+                    <div class="h-px bg-white/[0.06]"></div>
+                    <div class="flex justify-between text-xs text-text-muted"><span>Engineering</span><span>$1,880</span></div>
+                  </div>
+                </div>
+                <div class="h-9 rounded-lg flex items-center justify-center text-sm font-medium mt-3" style="background: {{ project.gradient_to }}; color: white;">Send Receipt</div>
+
+                {% elsif project.icon == "chart" %}
+                <div class="space-y-3">
+                  <div class="text-sm font-semibold text-text-primary">DORA Metrics</div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <div class="p-2.5 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+                      <div class="text-[10px] text-text-muted uppercase">Deploy Freq</div>
+                      <div class="text-base font-light text-text-primary mt-1">4.2<span class="text-xs text-text-muted">/day</span></div>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+                      <div class="text-[10px] text-text-muted uppercase">Lead Time</div>
+                      <div class="text-base font-light text-text-primary mt-1">2.1<span class="text-xs text-text-muted">hrs</span></div>
+                    </div>
+                  </div>
+                  <div class="flex items-end gap-1 h-12">
+                    <div class="flex-1 rounded-t" style="height:40%; background: {{ project.gradient_to }}44;"></div>
+                    <div class="flex-1 rounded-t" style="height:65%; background: {{ project.gradient_to }}66;"></div>
+                    <div class="flex-1 rounded-t" style="height:45%; background: {{ project.gradient_to }}44;"></div>
+                    <div class="flex-1 rounded-t" style="height:80%; background: {{ project.gradient_to }}88;"></div>
+                    <div class="flex-1 rounded-t" style="height:55%; background: {{ project.gradient_to }}55;"></div>
+                    <div class="flex-1 rounded-t" style="height:90%; background: {{ project.gradient_to }}aa;"></div>
+                    <div class="flex-1 rounded-t" style="height:70%; background: {{ project.gradient_to }}77;"></div>
+                  </div>
+                </div>
+                <div class="h-2.5 w-2/3 rounded bg-white/[0.04] mt-3"></div>
+
+                {% elsif project.icon == "shield" %}
+                <div class="space-y-3">
+                  <div class="flex items-center gap-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{{ project.gradient_to }}" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <div class="text-sm font-semibold text-text-primary">Vault</div>
+                  </div>
+                  <div class="space-y-2">
+                    <div class="flex items-center gap-3 p-2.5 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+                      <div class="w-5 h-5 rounded bg-white/[0.08] flex items-center justify-center text-[9px] text-text-muted">K</div>
+                      <div class="flex-1"><div class="text-xs text-text-primary">API_SECRET</div><div class="text-[10px] text-text-muted">************</div></div>
+                    </div>
+                    <div class="flex items-center gap-3 p-2.5 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+                      <div class="w-5 h-5 rounded bg-white/[0.08] flex items-center justify-center text-[9px] text-text-muted">K</div>
+                      <div class="flex-1"><div class="text-xs text-text-primary">DB_PASSWORD</div><div class="text-[10px] text-text-muted">************</div></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="h-7 px-3 rounded-full text-xs flex items-center font-medium mt-3 w-fit" style="background: {{ project.gradient_to }}33; color: {{ project.gradient_to }};">Encrypted</div>
+
+                {% elsif project.icon == "rocket" %}
+                <div class="space-y-3">
+                  <div class="text-sm font-semibold text-text-primary">Pipeline #847</div>
+                  <div class="space-y-2.5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-4 h-4 rounded-full flex items-center justify-center" style="background: #22c55e33;"><div class="w-1.5 h-1.5 rounded-full bg-green-400"></div></div>
+                      <div class="text-xs text-text-primary flex-1">Build</div>
+                      <div class="text-[10px] text-text-muted">12s</div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <div class="w-4 h-4 rounded-full flex items-center justify-center" style="background: #22c55e33;"><div class="w-1.5 h-1.5 rounded-full bg-green-400"></div></div>
+                      <div class="text-xs text-text-primary flex-1">Test</div>
+                      <div class="text-[10px] text-text-muted">45s</div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <div class="w-4 h-4 rounded-full flex items-center justify-center" style="background: {{ project.gradient_to }}33;"><div class="w-1.5 h-1.5 rounded-full animate-pulse" style="background: {{ project.gradient_to }};"></div></div>
+                      <div class="text-xs text-text-primary flex-1">Deploy</div>
+                      <div class="text-[10px] text-text-muted">running...</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="h-2 rounded-full bg-white/[0.06] overflow-hidden mt-3"><div class="h-full rounded-full w-[75%]" style="background: {{ project.gradient_to }};"></div></div>
+
+                {% elsif project.icon == "lens" %}
+                <div class="space-y-3">
+                  <div class="flex items-center gap-2 p-2 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="{{ project.gradient_to }}" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <div class="text-xs text-text-muted">Ask anything about your data...</div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <div class="p-2.5 rounded-lg bg-white/[0.04]">
+                      <div class="text-xl font-light text-text-primary">$1.2M</div>
+                      <div class="text-[10px] text-text-muted mt-1">Revenue</div>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-white/[0.04]">
+                      <div class="text-xl font-light text-text-primary">89%</div>
+                      <div class="text-[10px] text-text-muted mt-1">Retention</div>
+                    </div>
+                  </div>
+                  <div class="h-12 rounded-lg bg-white/[0.03] border border-white/[0.05] flex items-end p-2 gap-1">
+                    <div class="flex-1 rounded-t" style="height:30%; background: {{ project.gradient_to }}44;"></div>
+                    <div class="flex-1 rounded-t" style="height:50%; background: {{ project.gradient_to }}55;"></div>
+                    <div class="flex-1 rounded-t" style="height:70%; background: {{ project.gradient_to }}77;"></div>
+                    <div class="flex-1 rounded-t" style="height:45%; background: {{ project.gradient_to }}55;"></div>
+                    <div class="flex-1 rounded-t" style="height:85%; background: {{ project.gradient_to }}99;"></div>
+                  </div>
+                </div>
+
+                {% elsif project.icon == "form" %}
+                <div class="space-y-3">
+                  <div class="text-sm font-semibold text-text-primary">Contact Form</div>
+                  <div class="space-y-2">
+                    <div class="p-2 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+                      <div class="text-[10px] text-text-muted mb-1">Full Name</div>
+                      <div class="h-2.5 w-2/3 rounded bg-white/[0.08]"></div>
+                    </div>
+                    <div class="p-2 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+                      <div class="text-[10px] text-text-muted mb-1">Email</div>
+                      <div class="h-2.5 w-1/2 rounded bg-white/[0.08]"></div>
+                    </div>
+                    <div class="p-2 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+                      <div class="text-[10px] text-text-muted mb-1">Message</div>
+                      <div class="h-6 w-full rounded bg-white/[0.06]"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="h-9 rounded-lg flex items-center justify-center text-sm font-medium mt-3" style="background: {{ project.gradient_to }}; color: white;">Submit</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Description overlay -->
+          <div class="mt-4 text-center">
+            <p class="text-xs text-text-secondary font-light leading-relaxed max-w-md mx-auto">{{ project.description }}</p>
+            <div class="flex flex-wrap justify-center gap-1.5 mt-3">
+              {% for tech in project.tech %}
+              <span class="text-[10px] font-medium uppercase tracking-wider text-text-muted px-2 py-0.5 rounded-full border border-border-subtle">{{ tech }}</span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
     </div>
   </div>
 </section>

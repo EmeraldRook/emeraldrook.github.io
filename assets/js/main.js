@@ -1,13 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // ── Scroll-triggered fade-in animations ──
+  // ── Scroll-triggered reveal animations ──
+  const revealSelectors = '.reveal, .reveal-left, .reveal-scale';
+
   if (!prefersReducedMotion) {
-    const observer = new IntersectionObserver((entries) => {
+    const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
+          revealObserver.unobserve(entry.target);
         }
       });
     }, {
@@ -15,11 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
       rootMargin: '0px 0px -40px 0px'
     });
 
-    document.querySelectorAll('.animate-on-scroll').forEach(el => {
-      observer.observe(el);
+    document.querySelectorAll(revealSelectors).forEach(el => {
+      revealObserver.observe(el);
     });
   } else {
-    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+    document.querySelectorAll(revealSelectors).forEach(el => {
       el.classList.add('is-visible');
     });
   }
@@ -33,13 +35,13 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const duration = 2000;
+    const duration = 2500;
     const startTime = performance.now();
 
     function update(currentTime) {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
+      const eased = 1 - Math.pow(1 - progress, 4);
       el.textContent = Math.round(eased * target);
 
       if (progress < 1) {
@@ -82,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       menuBtn.setAttribute('aria-label', isOpen ? 'Open menu' : 'Close menu');
       menuBtn.setAttribute('aria-expanded', String(!isOpen));
+      document.body.style.overflow = isOpen ? '' : 'hidden';
     });
 
     mobileMenu.querySelectorAll('a').forEach(link => {
@@ -93,23 +96,54 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         menuBtn.setAttribute('aria-label', 'Open menu');
         menuBtn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
       });
     });
   }
 
-  // ── Navbar shadow on scroll ──
+  // ── Navbar: background on scroll + hide/show on direction ──
   const navbar = document.getElementById('navbar');
+  let lastScrollY = 0;
+  let ticking = false;
+
   if (navbar) {
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 10) {
-        navbar.classList.add('shadow-md');
+    function updateNavbar() {
+      const scrollY = window.scrollY;
+
+      if (scrollY > 50) {
+        navbar.style.background = 'rgba(10, 10, 10, 0.85)';
+        navbar.style.backdropFilter = 'blur(20px)';
+        navbar.style.borderBottom = '1px solid rgba(38, 38, 38, 0.5)';
       } else {
-        navbar.classList.remove('shadow-md');
+        navbar.style.background = 'transparent';
+        navbar.style.backdropFilter = 'none';
+        navbar.style.borderBottom = '1px solid transparent';
+      }
+
+      // Hide navbar on scroll down, show on scroll up
+      if (scrollY > 300) {
+        if (scrollY > lastScrollY + 5) {
+          navbar.style.transform = 'translateY(-100%)';
+        } else if (scrollY < lastScrollY - 5) {
+          navbar.style.transform = 'translateY(0)';
+        }
+      } else {
+        navbar.style.transform = 'translateY(0)';
+      }
+
+      lastScrollY = scrollY;
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(updateNavbar);
+        ticking = true;
       }
     }, { passive: true });
   }
 
-  // ── Smooth scroll with offset for fixed nav ──
+  // ── Smooth scroll with snap for nav links ──
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', (e) => {
       const targetId = anchor.getAttribute('href');
@@ -118,13 +152,55 @@ document.addEventListener('DOMContentLoaded', () => {
       const targetEl = document.querySelector(targetId);
       if (targetEl) {
         e.preventDefault();
-        const navHeight = document.getElementById('navbar')?.offsetHeight || 64;
-        const targetPosition = targetEl.getBoundingClientRect().top + window.scrollY - navHeight;
-        window.scrollTo({
-          top: targetPosition,
+        targetEl.scrollIntoView({
           behavior: prefersReducedMotion ? 'auto' : 'smooth'
         });
       }
     });
   });
+
+  // ── Project showcase hover interaction ──
+  const projectList = document.getElementById('project-list');
+  const previewArea = document.getElementById('project-preview-area');
+  const projectBg = document.getElementById('project-bg');
+
+  if (projectList && previewArea) {
+    const items = projectList.querySelectorAll('.project-item');
+    const previews = previewArea.querySelectorAll('.project-preview');
+    let activeIndex = 0;
+
+    function switchProject(newIndex) {
+      if (newIndex === activeIndex) return;
+
+      // Deactivate current
+      items[activeIndex].classList.remove('is-active');
+      previews[activeIndex].classList.remove('opacity-100', 'scale-100');
+      previews[activeIndex].classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+
+      // Activate new
+      items[newIndex].classList.add('is-active');
+      previews[newIndex].classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+      previews[newIndex].classList.add('opacity-100', 'scale-100');
+
+      // Update background gradient
+      if (projectBg) {
+        const from = items[newIndex].getAttribute('data-gradient-from');
+        projectBg.style.background = `radial-gradient(ellipse 80% 60% at 70% 50%, ${from} 0%, transparent 70%)`;
+      }
+
+      activeIndex = newIndex;
+    }
+
+    items.forEach((item) => {
+      item.addEventListener('mouseenter', () => {
+        const idx = parseInt(item.getAttribute('data-index'), 10);
+        switchProject(idx);
+      });
+
+      item.addEventListener('click', (e) => {
+        const href = item.getAttribute('href');
+        if (href === '#') e.preventDefault();
+      });
+    });
+  }
 });

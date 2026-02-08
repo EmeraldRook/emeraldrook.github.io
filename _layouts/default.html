@@ -9,155 +9,307 @@
   <!-- Tailwind CSS v4 via Play CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
-  <!-- Google Fonts: Space Grotesk + DM Sans -->
+  <!-- Google Fonts: Inter + Instrument Serif for contrast -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 
   <style type="text/tailwindcss">
     @theme {
-      --font-heading: "Space Grotesk", sans-serif;
-      --font-body: "DM Sans", sans-serif;
+      --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+      --font-serif: "Instrument Serif", "Georgia", serif;
 
-      /* Emerald green primary */
-      --color-primary: #059669;
-      --color-primary-light: #10B981;
-      --color-primary-dark: #047857;
-      --color-primary-soft: #ECFDF5;
+      /* Dark foundation */
+      --color-bg: #0a0a0a;
+      --color-bg-elevated: #111111;
+      --color-bg-card: #161616;
+      --color-bg-card-hover: #1a1a1a;
+      --color-bg-subtle: #0d0d0d;
 
-      /* Warm amber accent — complementary warmth for Emerald Rook */
-      --color-accent: #D97706;
-      --color-accent-light: #F59E0B;
-      --color-accent-dark: #B45309;
+      /* Emerald accent */
+      --color-emerald: #10B981;
+      --color-emerald-light: #34D399;
+      --color-emerald-dark: #059669;
+      --color-emerald-glow: rgba(16, 185, 129, 0.15);
+      --color-emerald-glow-strong: rgba(16, 185, 129, 0.3);
 
-      /* CTA uses rich amber for warmth + action */
-      --color-cta: #92400E;
-      --color-cta-hover: #78350F;
+      /* Text hierarchy */
+      --color-text-primary: #f5f5f5;
+      --color-text-secondary: #a3a3a3;
+      --color-text-tertiary: #737373;
+      --color-text-muted: #525252;
 
-      /* Light, natural backgrounds */
-      --color-bg: #FAFAF5;
-      --color-bg-alt: #ECFDF5;
-      --color-bg-card: #FFFFFF;
-      --color-bg-hero: #F0FDF4;
+      /* Borders */
+      --color-border: #262626;
+      --color-border-hover: #404040;
+      --color-border-subtle: #1a1a1a;
 
-      /* Readable dark green-tinted text */
-      --color-text: #064E3B;
-      --color-text-light: #4B6B5D;
-      --color-text-heading: #022C22;
-
-      /* Subtle borders */
-      --color-border: #D1E7DD;
-      --color-border-hover: #A7F3D0;
-
-      /* Tags */
-      --color-tag-bg: #ECFDF5;
-      --color-tag-text: #047857;
-
-      /* Footer */
-      --color-footer-bg: #022C22;
-      --color-footer-text: #A7F3D0;
-
-      /* Stats band */
-      --color-stats-bg: #047857;
-
-      /* Founder avatar colors */
-      --color-avatar-1: #059669;
-      --color-avatar-2: #92400E;
-      --color-avatar-3: #0891B2;
+      /* Functional */
+      --color-overlay: rgba(0, 0, 0, 0.6);
     }
 
+    /* Base styles */
     html {
       scroll-behavior: smooth;
-      font-family: var(--font-body);
-      color: var(--color-text);
+      scroll-snap-type: y mandatory;
+      font-family: var(--font-sans);
+      color: var(--color-text-primary);
+      background: var(--color-bg);
     }
 
+    body {
+      overflow-x: hidden;
+    }
+
+    /* ─── Full-page slide sections ─── */
+    .slide {
+      height: 100vh;
+      scroll-snap-align: start;
+      overflow: hidden;
+      position: relative;
+    }
+
+    ::selection {
+      background: var(--color-emerald);
+      color: #000;
+    }
+
+    /* Smooth scroll for reduced motion */
     @media (prefers-reduced-motion: reduce) {
-      html {
-        scroll-behavior: auto;
-      }
-      *,
-      *::before,
-      *::after {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
       }
-      .animate-on-scroll {
-        opacity: 1 !important;
-        transform: none !important;
-        transition: none !important;
-      }
+      .reveal { opacity: 1 !important; transform: none !important; }
     }
 
-    /* Scroll-triggered animations */
-    .animate-on-scroll {
+    /* ─── Reveal animations ─── */
+    .reveal {
       opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+      transform: translateY(24px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .animate-on-scroll.is-visible {
+    .reveal.is-visible {
       opacity: 1;
       transform: translateY(0);
     }
 
-    /* Stagger children */
-    .stagger-children > .animate-on-scroll:nth-child(1) { transition-delay: 0ms; }
-    .stagger-children > .animate-on-scroll:nth-child(2) { transition-delay: 80ms; }
-    .stagger-children > .animate-on-scroll:nth-child(3) { transition-delay: 160ms; }
-    .stagger-children > .animate-on-scroll:nth-child(4) { transition-delay: 240ms; }
-    .stagger-children > .animate-on-scroll:nth-child(5) { transition-delay: 320ms; }
-    .stagger-children > .animate-on-scroll:nth-child(6) { transition-delay: 400ms; }
-    .stagger-children > .animate-on-scroll:nth-child(7) { transition-delay: 480ms; }
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-60px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-left.is-visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
 
-    /* Decorative gradient blobs */
-    .blob {
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-scale.is-visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Stagger delays */
+    .stagger > *:nth-child(1) { transition-delay: 0ms; }
+    .stagger > *:nth-child(2) { transition-delay: 100ms; }
+    .stagger > *:nth-child(3) { transition-delay: 200ms; }
+    .stagger > *:nth-child(4) { transition-delay: 300ms; }
+    .stagger > *:nth-child(5) { transition-delay: 400ms; }
+    .stagger > *:nth-child(6) { transition-delay: 500ms; }
+    .stagger > *:nth-child(7) { transition-delay: 600ms; }
+
+    /* ─── Hero gradient animation ─── */
+    @keyframes gradient-shift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .hero-gradient {
+      background: radial-gradient(ellipse 80% 50% at 50% -20%, var(--color-emerald-glow) 0%, transparent 50%),
+                  radial-gradient(ellipse 60% 40% at 80% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+                  var(--color-bg);
+    }
+
+    /* ─── Noise texture overlay ─── */
+    .noise::after {
+      content: "";
       position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.4;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
       pointer-events: none;
+      z-index: 1;
     }
 
-    /* Card hover lift */
-    .card-hover {
-      transition: transform 0.25s ease-out, box-shadow 0.25s ease-out, border-color 0.25s ease-out;
+    /* ─── Horizontal rule glow ─── */
+    .hr-glow {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--color-emerald-dark), transparent);
+      border: none;
     }
-    .card-hover:hover {
+
+    /* ─── Project interactive showcase ─── */
+    .project-item {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .project-item.is-active .project-item-name {
+      color: var(--color-text-primary) !important;
+    }
+    .project-item:not(.is-active) {
+      opacity: 0.5;
+    }
+    .project-item:not(.is-active):hover {
+      opacity: 0.8;
+    }
+
+    .project-preview {
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ─── Text link hover ─── */
+    .text-link {
+      position: relative;
+      display: inline-block;
+    }
+    .text-link::after {
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--color-emerald);
+      transition: width 0.3s ease;
+    }
+    .text-link:hover::after {
+      width: 100%;
+    }
+
+    /* ─── Smooth cursor dot ─── */
+    .cursor-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--color-emerald);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: difference;
+      transition: transform 0.15s ease;
+    }
+
+    /* ─── Marquee scroll ─── */
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .marquee-track {
+      animation: marquee 30s linear infinite;
+    }
+    .marquee-track:hover {
+      animation-play-state: paused;
+    }
+
+    /* ─── Stat counter ─── */
+    .stat-item {
+      position: relative;
+    }
+    .stat-item::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1px;
+      height: 40%;
+      background: var(--color-border);
+    }
+    .stat-item:last-child::after {
+      display: none;
+    }
+
+    /* ─── Founder card ─── */
+    .founder-card {
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  background 0.3s ease;
+    }
+    .founder-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 12px 32px -8px rgba(5, 150, 105, 0.15);
+      background: var(--color-bg-card-hover);
     }
 
-    /* Smooth gradient text */
-    .gradient-text {
-      background: linear-gradient(135deg, #059669 0%, #D97706 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    /* ─── Nav link active indicator ─── */
+    .nav-link {
+      position: relative;
+    }
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: var(--color-emerald);
+      transition: width 0.3s ease, left 0.3s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+      left: 0;
     }
 
-    /* ===== Emerald stone text effects ===== */
+    /* ─── Button styles ─── */
+    .btn-primary {
+      background: var(--color-emerald);
+      color: #000;
+      font-weight: 500;
+      padding: 14px 32px;
+      border-radius: 100px;
+      transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    }
+    .btn-primary:hover {
+      background: var(--color-emerald-light);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--color-emerald-glow-strong);
+    }
 
-    /* SVG Filter (Turbulence + Specular with shimmer sweep) */
-    .emerald-svg-filter {
-      color: #059669;
+    .btn-outline {
+      border: 1px solid var(--color-border);
+      color: var(--color-text-primary);
+      font-weight: 500;
+      padding: 14px 32px;
+      border-radius: 100px;
+      transition: border-color 0.3s ease, background 0.3s ease, transform 0.2s ease;
+    }
+    .btn-outline:hover {
+      border-color: var(--color-text-secondary);
+      background: rgba(255,255,255,0.03);
+      transform: translateY(-2px);
+    }
+
+    /* ─── Emerald stone text effect ─── */
+    .emerald-stone-text {
+      color: #10B981;
       filter: url(#emerald-stone-filter);
     }
 
-    /* Focus ring utility */
-    .focus-ring {
-      outline: none;
-    }
-    .focus-ring:focus-visible {
-      outline: 2px solid var(--color-primary);
-      outline-offset: 2px;
-      border-radius: 4px;
-    }
+    /* ─── Scrollbar (hidden for slide feel) ─── */
+    ::-webkit-scrollbar { width: 0; background: transparent; }
+    html { scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-bg font-body text-text antialiased">
+<body class="bg-bg font-sans text-text-primary antialiased">
 
-  <a href="#projects" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[60] focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg focus:outline-2 focus:outline-primary focus:outline-offset-2">
+  <a href="#projects" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[60] focus:px-4 focus:py-2 focus:bg-emerald focus:text-black focus:rounded-full">
     Skip to main content
   </a>
 
@@ -166,8 +318,6 @@
   <main>
     {{ content }}
   </main>
-
-  {% include footer.html %}
 
   <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
 </body>
