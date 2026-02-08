@@ -144,6 +144,19 @@
       filter: url(#emerald-stone-filter);
     }
 
+    /* Nav logo text: hidden until hero scrolls away */
+    .nav-logo-text {
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+      pointer-events: none;
+    }
+    .nav-logo-text.is-visible {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
     /* Focus ring utility */
     .focus-ring {
       outline: none;

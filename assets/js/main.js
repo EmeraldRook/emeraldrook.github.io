@@ -109,6 +109,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: true });
   }
 
+  // ── Show nav logo text after scrolling past hero ──
+  const navLogoText = document.getElementById('nav-logo-text');
+  const heroSection = document.getElementById('hero');
+  if (navLogoText && heroSection) {
+    const heroObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLogoText.classList.remove('is-visible');
+        } else {
+          navLogoText.classList.add('is-visible');
+        }
+      });
+    }, { threshold: 0 });
+
+    heroObserver.observe(heroSection);
+  }
+
   // ── Smooth scroll with offset for fixed nav ──
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', (e) => {
