@@ -1,0 +1,62 @@
+- name: "CloudSync Platform"
+  description: "Real-time data synchronization platform for distributed teams. Handles conflict resolution and offline-first workflows."
+  tech:
+    - React
+    - Node.js
+    - PostgreSQL
+    - WebSocket
+  link: "#"
+
+- name: "PayFlow"
+  description: "Automated invoicing and payment processing SaaS. Supports multi-currency transactions and recurring billing."
+  tech:
+    - Next.js
+    - Stripe API
+    - TypeScript
+    - Redis
+  link: "#"
+
+- name: "DevMetrics Dashboard"
+  description: "Engineering productivity analytics tool. Tracks deployment frequency, lead time, and DORA metrics."
+  tech:
+    - Vue.js
+    - Python
+    - Grafana
+    - Docker
+  link: "#"
+
+- name: "SecureVault"
+  description: "Enterprise-grade secrets management solution with role-based access control and audit logging."
+  tech:
+    - Go
+    - AWS KMS
+    - Terraform
+    - gRPC
+  link: "#"
+
+- name: "ShipFast CI"
+  description: "Opinionated CI/CD pipeline builder for startups. From commit to production in under five minutes."
+  tech:
+    - Rust
+    - GitHub Actions
+    - Docker
+    - Kubernetes
+  link: "#"
+
+- name: "DataLens"
+  description: "Business intelligence tool for non-technical users. Drag-and-drop report builder with natural language queries."
+  tech:
+    - React
+    - Python
+    - OpenAI API
+    - Snowflake
+  link: "#"
+
+- name: "FormForge"
+  description: "Dynamic form builder with conditional logic, integrations, and analytics. Embeddable in any web application."
+  tech:
+    - Svelte
+    - TypeScript
+    - Supabase
+    - Tailwind CSS
+  link: "#"

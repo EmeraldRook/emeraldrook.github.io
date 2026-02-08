@@ -1,0 +1,30 @@
+<section id="contact" class="py-20 md:py-28 bg-bg">
+  <div class="max-w-3xl mx-auto px-4 md:px-6 lg:px-8 text-center">
+
+    <div class="animate-on-scroll">
+      <p class="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Get In Touch</p>
+      <h2 class="font-heading font-bold text-2xl md:text-3xl lg:text-4xl text-text-heading">
+        Let's Build Something Together
+      </h2>
+      <p class="mt-4 text-text-light text-lg max-w-xl mx-auto">
+        Have a project in mind? We'd love to hear about it.
+      </p>
+    </div>
+
+    <div class="mt-10 animate-on-scroll">
+      <a href="mailto:{{ site.company_email }}" class="inline-flex items-center gap-3 px-8 py-4 bg-cta hover:bg-cta-hover text-white font-medium rounded-xl transition-colors duration-200 cursor-pointer shadow-lg hover:shadow-xl focus-ring">
+        {% include icons/mail.html %}
+        {{ site.company_email }}
+      </a>
+    </div>
+
+    <div class="mt-8 flex items-center justify-center gap-4 animate-on-scroll">
+      <a href="{{ site.company_github }}" target="_blank" rel="noopener noreferrer" class="w-12 h-12 flex items-center justify-center rounded-xl bg-bg-card border border-border text-text-light hover:text-primary hover:border-border-hover hover:shadow-md transition-all duration-200 cursor-pointer focus-ring" aria-label="GitHub">
+        {% include icons/github.html %}
+      </a>
+      <a href="{{ site.company_linkedin }}" target="_blank" rel="noopener noreferrer" class="w-12 h-12 flex items-center justify-center rounded-xl bg-bg-card border border-border text-text-light hover:text-primary hover:border-border-hover hover:shadow-md transition-all duration-200 cursor-pointer focus-ring" aria-label="LinkedIn">
+        {% include icons/linkedin.html %}
+      </a>
+    </div>
+  </div>
+</section>

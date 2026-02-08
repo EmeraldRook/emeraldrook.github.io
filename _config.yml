@@ -1,0 +1,13 @@
+title: Emerald Rook
+description: "Software that moves with your ambition"
+url: "https://abdullahharithworks.github.io"
+baseurl: ""
+
+markdown: kramdown
+
+# Company-specific variables
+company_name: "Emerald Rook"
+company_tagline: "We craft software that adapts, scales, and propels your ideas into motion."
+company_email: "hello@emeraldrook.com"
+company_github: "https://github.com/emeraldrook"
+company_linkedin: "https://linkedin.com/company/emeraldrook"

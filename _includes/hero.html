@@ -1,0 +1,41 @@
+<section id="hero" class="relative min-h-screen flex items-center justify-center bg-bg-hero pt-16 overflow-hidden">
+  <!-- Decorative blobs -->
+  <div class="blob w-[500px] h-[500px] bg-primary-light/30 -top-40 -right-40" aria-hidden="true"></div>
+  <div class="blob w-[400px] h-[400px] bg-accent-light/20 bottom-20 -left-32" aria-hidden="true"></div>
+  <div class="blob w-[300px] h-[300px] bg-primary/20 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" aria-hidden="true"></div>
+
+  <div class="relative max-w-4xl mx-auto px-4 md:px-6 lg:px-8 text-center">
+
+    <h1 class="font-heading font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-text-heading tracking-tight animate-on-scroll">
+      We are <span class="emerald-svg-filter">{{ site.company_name }}</span>
+    </h1>
+
+    <!-- Inline SVG filter: turbulence + specular with animated shimmer sweep -->
+    <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+      <filter id="emerald-stone-filter">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" seed="2" result="noise" />
+        <feSpecularLighting in="noise" surfaceScale="6" specularConstant="1.2" specularExponent="20" lighting-color="#6EE7B7" result="specular">
+          <fePointLight x="-200" y="-200" z="300">
+            <animate attributeName="x" values="-200;600;-200" dur="3s" repeatCount="indefinite" />
+          </fePointLight>
+        </feSpecularLighting>
+        <feComposite in="specular" in2="SourceAlpha" operator="in" result="lit" />
+        <feComposite in="SourceGraphic" in2="lit" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" />
+      </filter>
+    </svg>
+
+    <p class="mt-6 text-lg md:text-xl text-text-light max-w-2xl mx-auto leading-relaxed font-bold animate-on-scroll">
+      Rare by design.
+    </p>
+
+    <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-on-scroll">
+      <a href="#projects" class="inline-flex items-center gap-2 px-8 py-4 bg-cta hover:bg-cta-hover text-white font-medium rounded-xl transition-colors duration-200 cursor-pointer shadow-lg hover:shadow-xl focus-ring">
+        View Our Work
+        {% include icons/chevron-down.html %}
+      </a>
+      <a href="#contact" class="inline-flex items-center gap-2 px-8 py-4 bg-bg-card hover:bg-bg border border-border text-text-heading font-medium rounded-xl transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md focus-ring">
+        Get In Touch
+      </a>
+    </div>
+  </div>
+</section>

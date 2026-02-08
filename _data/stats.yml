@@ -1,0 +1,15 @@
+- label: "Years of Experience"
+  value: 8
+  suffix: "+"
+
+- label: "Projects Delivered"
+  value: 30
+  suffix: "+"
+
+- label: "Clients Served"
+  value: 15
+  suffix: "+"
+
+- label: "Technologies Used"
+  value: 40
+  suffix: "+"

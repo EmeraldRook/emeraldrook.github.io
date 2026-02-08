@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ site.title }}</title>
+  <meta name="description" content="{{ site.description }}">
+
+  <!-- Tailwind CSS v4 via Play CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <!-- Google Fonts: Space Grotesk + DM Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style type="text/tailwindcss">
+    @theme {
+      --font-heading: "Space Grotesk", sans-serif;
+      --font-body: "DM Sans", sans-serif;
+
+      /* Emerald green primary */
+      --color-primary: #059669;
+      --color-primary-light: #10B981;
+      --color-primary-dark: #047857;
+      --color-primary-soft: #ECFDF5;
+
+      /* Warm amber accent — complementary warmth for Emerald Rook */
+      --color-accent: #D97706;
+      --color-accent-light: #F59E0B;
+      --color-accent-dark: #B45309;
+
+      /* CTA uses rich amber for warmth + action */
+      --color-cta: #92400E;
+      --color-cta-hover: #78350F;
+
+      /* Light, natural backgrounds */
+      --color-bg: #FAFAF5;
+      --color-bg-alt: #ECFDF5;
+      --color-bg-card: #FFFFFF;
+      --color-bg-hero: #F0FDF4;
+
+      /* Readable dark green-tinted text */
+      --color-text: #064E3B;
+      --color-text-light: #4B6B5D;
+      --color-text-heading: #022C22;
+
+      /* Subtle borders */
+      --color-border: #D1E7DD;
+      --color-border-hover: #A7F3D0;
+
+      /* Tags */
+      --color-tag-bg: #ECFDF5;
+      --color-tag-text: #047857;
+
+      /* Footer */
+      --color-footer-bg: #022C22;
+      --color-footer-text: #A7F3D0;
+
+      /* Stats band */
+      --color-stats-bg: #047857;
+
+      /* Founder avatar colors */
+      --color-avatar-1: #059669;
+      --color-avatar-2: #92400E;
+      --color-avatar-3: #0891B2;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-family: var(--font-body);
+      color: var(--color-text);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .animate-on-scroll {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+    }
+
+    /* Scroll-triggered animations */
+    .animate-on-scroll {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    }
+    .animate-on-scroll.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Stagger children */
+    .stagger-children > .animate-on-scroll:nth-child(1) { transition-delay: 0ms; }
+    .stagger-children > .animate-on-scroll:nth-child(2) { transition-delay: 80ms; }
+    .stagger-children > .animate-on-scroll:nth-child(3) { transition-delay: 160ms; }
+    .stagger-children > .animate-on-scroll:nth-child(4) { transition-delay: 240ms; }
+    .stagger-children > .animate-on-scroll:nth-child(5) { transition-delay: 320ms; }
+    .stagger-children > .animate-on-scroll:nth-child(6) { transition-delay: 400ms; }
+    .stagger-children > .animate-on-scroll:nth-child(7) { transition-delay: 480ms; }
+
+    /* Decorative gradient blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* Card hover lift */
+    .card-hover {
+      transition: transform 0.25s ease-out, box-shadow 0.25s ease-out, border-color 0.25s ease-out;
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px -8px rgba(5, 150, 105, 0.15);
+    }
+
+    /* Smooth gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #059669 0%, #D97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ===== Emerald stone text effects ===== */
+
+    /* SVG Filter (Turbulence + Specular with shimmer sweep) */
+    .emerald-svg-filter {
+      color: #059669;
+      filter: url(#emerald-stone-filter);
+    }
+
+    /* Focus ring utility */
+    .focus-ring {
+      outline: none;
+    }
+    .focus-ring:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-bg font-body text-text antialiased">
+
+  <a href="#projects" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[60] focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg focus:outline-2 focus:outline-primary focus:outline-offset-2">
+    Skip to main content
+  </a>
+
+  {% include nav.html %}
+
+  <main>
+    {{ content }}
+  </main>
+
+  {% include footer.html %}
+
+  <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+</body>
+</html>
