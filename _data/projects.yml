@@ -68,30 +68,12 @@
   gradient_to: "#ef4444"
   icon: "rocket"
 
-- name: "DataLens"
-  short: "DataLens"
-  description: "Business intelligence tool for non-technical users. Drag-and-drop report builder with natural language queries."
-  category: "Business Intelligence"
-  tech:
-    - React
-    - Python
-    - OpenAI API
-    - Snowflake
-  link: "#"
-  gradient_from: "#2e1065"
-  gradient_to: "#a855f7"
-  icon: "lens"
-
-- name: "FormForge"
-  short: "FormForge"
-  description: "Dynamic form builder with conditional logic, integrations, and analytics. Embeddable in any web application."
-  category: "No-Code Tools"
-  tech:
-    - Svelte
-    - TypeScript
-    - Supabase
-    - Tailwind CSS
+- name: "All Work"
+  short: "All Work"
+  description: "Explore our complete portfolio of products spanning analytics, form builders, e-commerce platforms, and more."
+  category: "Portfolio"
+  tech: []
   link: "#"
   gradient_from: "#052e16"
-  gradient_to: "#22c55e"
-  icon: "form"
+  gradient_to: "#10B981"
+  icon: "all"

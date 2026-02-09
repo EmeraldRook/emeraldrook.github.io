@@ -1,14 +1,6 @@
-<section id="hero" class="slide relative flex flex-col justify-center hero-gradient noise">
-  <!-- Ambient glow orbs -->
-  <div class="absolute top-[-20%] left-[50%] translate-x-[-50%] w-[800px] h-[600px] rounded-full bg-emerald/[0.07] blur-[120px] pointer-events-none" aria-hidden="true"></div>
-  <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-emerald/[0.04] blur-[100px] pointer-events-none" aria-hidden="true"></div>
-
-  <!-- Grid lines decoration -->
-  <div class="absolute inset-0 pointer-events-none opacity-[0.03]" aria-hidden="true">
-    <div class="absolute top-0 left-[25%] w-px h-full bg-text-primary"></div>
-    <div class="absolute top-0 left-[50%] w-px h-full bg-text-primary"></div>
-    <div class="absolute top-0 left-[75%] w-px h-full bg-text-primary"></div>
-  </div>
+<section id="hero" class="slide relative flex flex-col justify-center noise">
+  <!-- Abstract animated background -->
+  <canvas id="hero-canvas" class="absolute inset-0 w-full h-full" style="pointer-events:none;" aria-hidden="true"></canvas>
 
   <div class="relative z-10 max-w-[1400px] mx-auto px-6 md:px-10 lg:px-16 w-full">
     <!-- Eyebrow -->
