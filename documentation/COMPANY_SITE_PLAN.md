@@ -11,7 +11,8 @@ Emerald Rook is a single-page company website deployed via GitHub Pages. Built w
 ## File Structure
 
 ```
-D:\Development\PersonalWebsite\
+./
+  CLAUDE.md                           Project rules for Claude Code (pre-commit doc update)
   _config.yml                         Company variables (name, tagline, contact)
   index.html                          Single-page entry with include directives
   _layouts/
