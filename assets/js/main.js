@@ -379,12 +379,93 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ── Canvas scroll fade + mouse flashlight ──
+  function initCanvasScrollFade() {
+    var canvasEl = document.getElementById('hero-canvas');
+    var noiseEl = document.getElementById('hero-noise');
+    if (!canvasEl) return;
+
+    var scrollProgress = 0;
+    var mouseClientX = -1;
+    var mouseClientY = -1;
+    var mouseActive = false;
+    var rafId = 0;
+
+    ScrollTrigger.create({
+      trigger: '#projects-scroll-wrapper',
+      start: 'top bottom',
+      end: 'top top',
+      scrub: true,
+      onUpdate: function (self) {
+        scrollProgress = self.progress;
+        scheduleApply();
+      }
+    });
+
+    document.addEventListener('mousemove', function (e) {
+      mouseClientX = e.clientX;
+      mouseClientY = e.clientY;
+      mouseActive = true;
+      scheduleApply();
+    }, { passive: true });
+
+    document.addEventListener('mouseleave', function () {
+      mouseActive = false;
+      scheduleApply();
+    }, { passive: true });
+
+    function scheduleApply() {
+      if (!rafId) {
+        rafId = requestAnimationFrame(applyMask);
+      }
+    }
+
+    function applyMask() {
+      rafId = 0;
+      var ambientAlpha = 1 - scrollProgress;
+
+      // During hero (fully visible): remove mask for zero overhead
+      if (ambientAlpha >= 0.999) {
+        setMask(canvasEl, 'none');
+        if (noiseEl) setMask(noiseEl, 'none');
+        canvasEl.style.opacity = '1';
+        if (noiseEl) noiseEl.style.opacity = '1';
+        return;
+      }
+
+      canvasEl.style.opacity = '1';
+      if (noiseEl) noiseEl.style.opacity = '1';
+
+      var mask;
+      if (mouseActive) {
+        var centerAlpha = Math.max(ambientAlpha, scrollProgress * 0.5);
+        mask = 'radial-gradient(circle 250px at ' + mouseClientX + 'px ' + mouseClientY + 'px, rgba(0,0,0,' + centerAlpha + '), rgba(0,0,0,' + ambientAlpha + '))';
+      } else {
+        // No mouse: uniform mask at ambient level
+        if (ambientAlpha <= 0.001) {
+          mask = 'linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0))';
+        } else {
+          mask = 'linear-gradient(rgba(0,0,0,' + ambientAlpha + '), rgba(0,0,0,' + ambientAlpha + '))';
+        }
+      }
+
+      setMask(canvasEl, mask);
+      if (noiseEl) setMask(noiseEl, mask);
+    }
+
+    function setMask(el, value) {
+      el.style.webkitMaskImage = value;
+      el.style.maskImage = value;
+    }
+  }
+
   // ── Initialize all ──
   initHeroToNav();
   initStatBadges();
   initProjectScroll();
   initStatsFounders();
   initRevealTriggers();
+  initCanvasScrollFade();
 
   // ── 8. Resize handler ──
   let resizeTimer;

@@ -268,20 +268,17 @@
     animate();
   }
 
-  // ── Mouse tracking ──
-  var heroSection = document.getElementById('hero');
-  if (heroSection) {
-    heroSection.addEventListener('mousemove', function (e) {
-      var rect = canvas.getBoundingClientRect();
-      mouseX = e.clientX - rect.left;
-      mouseY = e.clientY - rect.top;
-    }, { passive: true });
+  // ── Mouse tracking (document-level for flashlight effect) ──
+  document.addEventListener('mousemove', function (e) {
+    var rect = canvas.getBoundingClientRect();
+    mouseX = e.clientX - rect.left;
+    mouseY = e.clientY - rect.top;
+  }, { passive: true });
 
-    heroSection.addEventListener('mouseleave', function () {
-      mouseX = -1000;
-      mouseY = -1000;
-    }, { passive: true });
-  }
+  document.addEventListener('mouseleave', function () {
+    mouseX = -1000;
+    mouseY = -1000;
+  }, { passive: true });
 
   // ── Start ──
   init();
