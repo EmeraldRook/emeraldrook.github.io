@@ -65,7 +65,7 @@ No serif font. Single-family design.
 | Token | Value | Usage |
 |-------|-------|-------|
 | Background | `#0a0a0a` | Main bg (near-black) |
-| BG Elevated | `#111111` | Stats-founders section |
+| BG Elevated | `#111111` | Available for elevated surfaces (no longer used on stats-founders) |
 | BG Card | `#161616` | Card surfaces |
 | BG Card Hover | `#1a1a1a` | Card hover state |
 | BG Subtle | `#0d0d0d` | Subtle layers |
