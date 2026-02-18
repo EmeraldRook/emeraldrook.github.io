@@ -3,15 +3,13 @@
 
   var canvas = document.getElementById('hero-canvas');
   if (!canvas) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var ctx = canvas.getContext('2d');
   var dpr = Math.min(window.devicePixelRatio || 1, 2);
   var width, height;
-  var particles = [];
-  var crystals = [];
-  var orbs = [];
-  var gridLines = [];
+  var vertices = [];
+  var triangles = [];
   var time = 0;
   var animId;
   var mouseX = -1000, mouseY = -1000;
@@ -36,239 +34,130 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
-  // ── Initialize ──
-  function init() {
-    resize();
-    particles = [];
-    crystals = [];
-    orbs = [];
-    gridLines = [];
+  // ── Generate triangulated mesh ──
+  function generateMesh() {
+    vertices = [];
+    triangles = [];
 
-    // Glow orbs — large soft emerald blobs that drift slowly
-    var orbConfigs = [
-      { bx: 0.65, by: 0.3, r: 280 },
-      { bx: 0.25, by: 0.6, r: 220 },
-      { bx: 0.8, by: 0.7, r: 180 },
-    ];
-    orbConfigs.forEach(function (cfg, i) {
-      orbs.push({
-        baseX: width * cfg.bx,
-        baseY: height * cfg.by,
-        x: width * cfg.bx,
-        y: height * cfg.by,
-        radius: cfg.r,
-        phase: i * 2.1,
-        speedX: 0.0004 + i * 0.0001,
-        speedY: 0.0003 + i * 0.00015,
-        ampX: 60 + i * 20,
-        ampY: 40 + i * 15,
-      });
-    });
+    // Grid-based vertex generation with jitter
+    var cellSize = Math.max(80, Math.min(120, width / 14));
+    var cols = Math.ceil(width / cellSize) + 2;
+    var rows = Math.ceil(height / cellSize) + 2;
+    var jitter = cellSize * 0.35;
 
-    // Particles — floating dots connected by lines
-    var count = Math.min(70, Math.floor((width * height) / 18000));
-    for (var i = 0; i < count; i++) {
-      particles.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.35,
-        vy: (Math.random() - 0.5) * 0.35,
-        size: Math.random() * 1.8 + 0.5,
-        opacity: Math.random() * 0.35 + 0.08,
-        pulse: Math.random() * Math.PI * 2,
-      });
+    // Create grid vertices
+    for (var r = -1; r <= rows; r++) {
+      for (var c = -1; c <= cols; c++) {
+        var baseX = c * cellSize;
+        var baseY = r * cellSize;
+        var jx = (Math.random() - 0.5) * jitter * 2;
+        var jy = (Math.random() - 0.5) * jitter * 2;
+
+        vertices.push({
+          x: baseX + jx,
+          y: baseY + jy,
+          baseX: baseX + jx,
+          baseY: baseY + jy,
+          phase: Math.random() * Math.PI * 2,
+          ampX: 1.5 + Math.random() * 2.5,
+          ampY: 1.5 + Math.random() * 2.5,
+          speedX: 0.003 + Math.random() * 0.005,
+          speedY: 0.002 + Math.random() * 0.004
+        });
+      }
     }
 
-    // Crystal shapes — slowly rotating geometric forms (emerald facets / rook battlements)
-    var crystalConfigs = [
-      { sides: 6, sz: 60, op: 0.04 },  // hexagon (emerald cross-section)
-      { sides: 8, sz: 45, op: 0.035 }, // octagon
-      { sides: 4, sz: 50, op: 0.03 },  // diamond
-      { sides: 5, sz: 35, op: 0.04 },  // pentagon
-      { sides: 6, sz: 70, op: 0.025 }, // large hexagon
-    ];
-    crystalConfigs.forEach(function (cfg) {
-      crystals.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.12,
-        vy: (Math.random() - 0.5) * 0.12,
-        rotation: Math.random() * Math.PI * 2,
-        rotSpeed: (Math.random() - 0.5) * 0.002,
-        size: cfg.sz,
-        sides: cfg.sides,
-        opacity: cfg.op,
-        innerRatio: 0.5 + Math.random() * 0.3, // for inner facet lines
-      });
-    });
+    // Two triangles per quad (Delaunay-like)
+    var totalCols = cols + 2;
+    for (var r2 = 0; r2 < rows + 1; r2++) {
+      for (var c2 = 0; c2 < totalCols - 1; c2++) {
+        var i = r2 * totalCols + c2;
+        var j = i + 1;
+        var k = i + totalCols;
+        var l = k + 1;
 
-    // Subtle grid lines — faint chessboard-like pattern that drifts
-    for (var g = 0; g < 6; g++) {
-      gridLines.push({
-        isVertical: g < 3,
-        position: (g < 3) ? width * (0.2 + g * 0.3) : height * (0.2 + (g - 3) * 0.3),
-        drift: Math.random() * Math.PI * 2,
-        speed: 0.0002 + Math.random() * 0.0002,
-        amp: 30 + Math.random() * 20,
-        opacity: 0.02 + Math.random() * 0.015,
-      });
+        if (k < vertices.length && l < vertices.length) {
+          // Randomize diagonal direction for variety
+          if (Math.random() > 0.5) {
+            triangles.push({ a: i, b: j, c: k });
+            triangles.push({ a: j, b: l, c: k });
+          } else {
+            triangles.push({ a: i, b: j, c: l });
+            triangles.push({ a: i, b: l, c: k });
+          }
+        }
+      }
     }
   }
 
-  // ── Draw glow orbs ──
-  function drawOrbs() {
-    orbs.forEach(function (orb) {
-      orb.x = orb.baseX + Math.sin(time * orb.speedX + orb.phase) * orb.ampX;
-      orb.y = orb.baseY + Math.cos(time * orb.speedY + orb.phase) * orb.ampY;
-
-      var grad = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.radius);
-      grad.addColorStop(0, rgba(emerald, 0.12));
-      grad.addColorStop(0.4, rgba(emeraldDark, 0.05));
-      grad.addColorStop(1, rgba(emerald, 0));
-
-      ctx.fillStyle = grad;
-      ctx.fillRect(orb.x - orb.radius, orb.y - orb.radius, orb.radius * 2, orb.radius * 2);
-    });
+  // ── Get triangle centroid ──
+  function centroid(tri) {
+    var va = vertices[tri.a];
+    var vb = vertices[tri.b];
+    var vc = vertices[tri.c];
+    return {
+      x: (va.x + vb.x + vc.x) / 3,
+      y: (va.y + vb.y + vc.y) / 3
+    };
   }
 
-  // ── Draw grid lines ──
-  function drawGrid() {
-    gridLines.forEach(function (line) {
-      var offset = Math.sin(time * line.speed + line.drift) * line.amp;
-      ctx.beginPath();
+  // ── Draw triangulated mesh ──
+  function drawMesh() {
+    var specularRadius = 300;
+    var specularRadiusSq = specularRadius * specularRadius;
 
-      if (line.isVertical) {
-        var x = line.position + offset;
-        ctx.moveTo(x, 0);
-        // Slight wave
-        for (var y = 0; y <= height; y += 50) {
-          var wave = Math.sin(y * 0.003 + time * 0.001) * 8;
-          ctx.lineTo(x + wave, y);
-        }
-      } else {
-        var y2 = line.position + offset;
-        ctx.moveTo(0, y2);
-        for (var x2 = 0; x2 <= width; x2 += 50) {
-          var wave2 = Math.sin(x2 * 0.003 + time * 0.001) * 8;
-          ctx.lineTo(x2, y2 + wave2);
-        }
+    for (var i = 0; i < triangles.length; i++) {
+      var tri = triangles[i];
+      var va = vertices[tri.a];
+      var vb = vertices[tri.b];
+      var vc = vertices[tri.c];
+
+      // Calculate centroid for specular
+      var cx = (va.x + vb.x + vc.x) / 3;
+      var cy = (va.y + vb.y + vc.y) / 3;
+
+      // Base emerald fill (very low opacity)
+      var baseOpacity = 0.02 + Math.sin(time * 0.001 + cx * 0.002 + cy * 0.003) * 0.01;
+
+      // Mouse-reactive specular highlight
+      var mdx = cx - mouseX;
+      var mdy = cy - mouseY;
+      var mDistSq = mdx * mdx + mdy * mdy;
+      var specular = 0;
+
+      if (mDistSq < specularRadiusSq) {
+        var mDist = Math.sqrt(mDistSq);
+        specular = (1 - mDist / specularRadius) * 0.12;
       }
 
-      ctx.strokeStyle = rgba(emerald, line.opacity);
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    });
-  }
+      var fillOpacity = Math.min(baseOpacity + specular, 0.18);
 
-  // ── Draw crystal shapes ──
-  function drawCrystals() {
-    crystals.forEach(function (c) {
-      c.x += c.vx;
-      c.y += c.vy;
-      c.rotation += c.rotSpeed;
+      // Choose color based on position (subtle variety)
+      var colorChoice = ((i * 7) % 3);
+      var fillColor = colorChoice === 0 ? emerald : (colorChoice === 1 ? emeraldLight : emeraldDark);
 
-      // Wrap around edges
-      if (c.x < -c.size * 2) c.x = width + c.size;
-      if (c.x > width + c.size * 2) c.x = -c.size;
-      if (c.y < -c.size * 2) c.y = height + c.size;
-      if (c.y > height + c.size * 2) c.y = -c.size;
-
-      ctx.save();
-      ctx.translate(c.x, c.y);
-      ctx.rotate(c.rotation);
-
-      // Outer shape
+      // Draw triangle fill
       ctx.beginPath();
-      for (var i = 0; i < c.sides; i++) {
-        var angle = (Math.PI * 2 / c.sides) * i - Math.PI / 2;
-        var px = Math.cos(angle) * c.size;
-        var py = Math.sin(angle) * c.size;
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
+      ctx.moveTo(va.x, va.y);
+      ctx.lineTo(vb.x, vb.y);
+      ctx.lineTo(vc.x, vc.y);
       ctx.closePath();
-      ctx.strokeStyle = rgba(emeraldLight, c.opacity);
-      ctx.lineWidth = 1;
-      ctx.stroke();
-      ctx.fillStyle = rgba(emerald, c.opacity * 0.2);
+      ctx.fillStyle = rgba(fillColor, fillOpacity);
       ctx.fill();
 
-      // Inner facet lines — from center to each vertex
-      for (var j = 0; j < c.sides; j++) {
-        var a = (Math.PI * 2 / c.sides) * j - Math.PI / 2;
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(Math.cos(a) * c.size * c.innerRatio, Math.sin(a) * c.size * c.innerRatio);
-        ctx.strokeStyle = rgba(emerald, c.opacity * 0.5);
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
-      }
-
-      ctx.restore();
-    });
+      // Subtle edge lines
+      ctx.strokeStyle = rgba(emerald, 0.015 + specular * 0.3);
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
   }
 
-  // ── Draw particles and connections ──
-  function drawParticles() {
-    var connectionDist = 130;
-    var connectionDistSq = connectionDist * connectionDist;
-    var mouseInfluence = 150;
-
-    for (var i = 0; i < particles.length; i++) {
-      var p = particles[i];
-
-      // Subtle mouse repulsion
-      var mdx = p.x - mouseX;
-      var mdy = p.y - mouseY;
-      var mDist = Math.sqrt(mdx * mdx + mdy * mdy);
-      if (mDist < mouseInfluence && mDist > 0) {
-        var force = (1 - mDist / mouseInfluence) * 0.5;
-        p.vx += (mdx / mDist) * force;
-        p.vy += (mdy / mDist) * force;
-      }
-
-      // Damping
-      p.vx *= 0.998;
-      p.vy *= 0.998;
-
-      // Update position
-      p.x += p.vx;
-      p.y += p.vy;
-
-      // Wrap
-      if (p.x < 0) p.x = width;
-      if (p.x > width) p.x = 0;
-      if (p.y < 0) p.y = height;
-      if (p.y > height) p.y = 0;
-
-      // Pulse
-      p.pulse += 0.02;
-      var pulseAlpha = p.opacity + Math.sin(p.pulse) * 0.05;
-
-      // Draw particle
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fillStyle = rgba(emeraldLight, pulseAlpha);
-      ctx.fill();
-
-      // Connections
-      for (var j = i + 1; j < particles.length; j++) {
-        var p2 = particles[j];
-        var dx = p.x - p2.x;
-        var dy = p.y - p2.y;
-        var distSq = dx * dx + dy * dy;
-
-        if (distSq < connectionDistSq) {
-          var dist = Math.sqrt(distSq);
-          var alpha = (1 - dist / connectionDist) * 0.12;
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.strokeStyle = rgba(emerald, alpha);
-          ctx.lineWidth = 0.5;
-          ctx.stroke();
-        }
-      }
+  // ── Update vertex positions (gentle drift) ──
+  function updateVertices() {
+    for (var i = 0; i < vertices.length; i++) {
+      var v = vertices[i];
+      v.x = v.baseX + Math.sin(time * v.speedX + v.phase) * v.ampX;
+      v.y = v.baseY + Math.cos(time * v.speedY + v.phase * 1.3) * v.ampY;
     }
   }
 
@@ -276,13 +165,24 @@
   function animate() {
     time++;
     ctx.clearRect(0, 0, width, height);
-
-    drawOrbs();
-    drawGrid();
-    drawCrystals();
-    drawParticles();
-
+    updateVertices();
+    drawMesh();
     animId = requestAnimationFrame(animate);
+  }
+
+  // ── Initialize ──
+  function init() {
+    resize();
+    generateMesh();
+
+    if (prefersReducedMotion) {
+      // Single static frame
+      updateVertices();
+      drawMesh();
+      return;
+    }
+
+    animate();
   }
 
   // ── Mouse tracking ──
@@ -302,16 +202,14 @@
 
   // ── Start ──
   init();
-  animate();
 
   // ── Handle resize ──
   var resizeTimer;
   window.addEventListener('resize', function () {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function () {
-      cancelAnimationFrame(animId);
+      if (animId) cancelAnimationFrame(animId);
       init();
-      animate();
     }, 200);
   });
 })();

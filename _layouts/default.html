@@ -9,15 +9,14 @@
   <!-- Tailwind CSS v4 via Play CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
-  <!-- Google Fonts: Inter + Instrument Serif for contrast -->
+  <!-- Google Fonts: Sora -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style type="text/tailwindcss">
     @theme {
-      --font-sans: "Inter", system-ui, -apple-system, sans-serif;
-      --font-serif: "Instrument Serif", "Georgia", serif;
+      --font-sans: "Sora", system-ui, -apple-system, sans-serif;
 
       /* Dark foundation */
       --color-bg: #0a0a0a;
@@ -50,8 +49,6 @@
 
     /* Base styles */
     html {
-      scroll-behavior: smooth;
-      scroll-snap-type: y mandatory;
       font-family: var(--font-sans);
       color: var(--color-text-primary);
       background: var(--color-bg);
@@ -61,20 +58,12 @@
       overflow-x: hidden;
     }
 
-    /* ─── Full-page slide sections ─── */
-    .slide {
-      height: 100vh;
-      scroll-snap-align: start;
-      overflow: hidden;
-      position: relative;
-    }
-
     ::selection {
       background: var(--color-emerald);
       color: #000;
     }
 
-    /* Smooth scroll for reduced motion */
+    /* Reduced motion */
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       *, *::before, *::after {
@@ -85,7 +74,7 @@
       .reveal { opacity: 1 !important; transform: none !important; }
     }
 
-    /* ─── Reveal animations ─── */
+    /* ─── Reveal animations (GSAP-driven, CSS fallback) ─── */
     .reveal {
       opacity: 0;
       transform: translateY(24px);
@@ -195,31 +184,6 @@
       width: 100%;
     }
 
-    /* ─── Smooth cursor dot ─── */
-    .cursor-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--color-emerald);
-      border-radius: 50%;
-      position: fixed;
-      pointer-events: none;
-      z-index: 9999;
-      mix-blend-mode: difference;
-      transition: transform 0.15s ease;
-    }
-
-    /* ─── Marquee scroll ─── */
-    @keyframes marquee {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-    .marquee-track {
-      animation: marquee 30s linear infinite;
-    }
-    .marquee-track:hover {
-      animation-play-state: paused;
-    }
-
     /* ─── Stat counter ─── */
     .stat-item {
       position: relative;
@@ -248,25 +212,6 @@
       background: var(--color-bg-card-hover);
     }
 
-    /* ─── Nav link active indicator ─── */
-    .nav-link {
-      position: relative;
-    }
-    .nav-link::after {
-      content: "";
-      position: absolute;
-      bottom: -4px;
-      left: 50%;
-      width: 0;
-      height: 2px;
-      background: var(--color-emerald);
-      transition: width 0.3s ease, left 0.3s ease;
-    }
-    .nav-link:hover::after {
-      width: 100%;
-      left: 0;
-    }
-
     /* ─── Button styles ─── */
     .btn-primary {
       background: var(--color-emerald);
@@ -275,6 +220,7 @@
       padding: 14px 32px;
       border-radius: 100px;
       transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      cursor: pointer;
     }
     .btn-primary:hover {
       background: var(--color-emerald-light);
@@ -289,6 +235,7 @@
       padding: 14px 32px;
       border-radius: 100px;
       transition: border-color 0.3s ease, background 0.3s ease, transform 0.2s ease;
+      cursor: pointer;
     }
     .btn-outline:hover {
       border-color: var(--color-text-secondary);
@@ -302,7 +249,51 @@
       filter: url(#emerald-stone-filter);
     }
 
-    /* ─── Scrollbar (hidden for slide feel) ─── */
+    /* ─── New typography utilities ─── */
+    .text-hero {
+      font-weight: 200;
+      font-size: clamp(3rem, 8vw, 8rem);
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+    }
+
+    .text-stat-number {
+      font-weight: 200;
+      font-size: clamp(3rem, 5vw, 4.5rem);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .text-label {
+      font-weight: 500;
+      font-size: 0.6875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+    }
+
+    /* ─── Stat badge (fixed corner) ─── */
+    .stat-badge {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 40;
+      pointer-events: none;
+    }
+
+    /* ─── Assembled nav (frosted glass) ─── */
+    #assembled-nav.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #assembled-nav {
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(38, 38, 38, 0.5);
+    }
+
+    /* ─── Scrollbar (hidden for immersive feel) ─── */
     ::-webkit-scrollbar { width: 0; background: transparent; }
     html { scrollbar-width: none; }
   </style>
@@ -313,13 +304,42 @@
     Skip to main content
   </a>
 
-  {% include nav.html %}
+  <!-- Assembled nav — starts invisible, populated by hero-to-nav animation -->
+  <nav id="assembled-nav" class="fixed top-0 left-0 right-0 z-50 opacity-0 pointer-events-none">
+    <div class="max-w-[1400px] mx-auto px-6 md:px-10 lg:px-16">
+      <div class="flex items-center justify-between h-16 md:h-20">
+        <!-- Left: logo + emerald-textured name -->
+        <a href="#hero" class="flex items-center gap-3 group" aria-label="{{ site.company_name }} home">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" class="w-7 h-7" aria-hidden="true">
+            <rect x="4" y="28" width="24" height="3" rx="1" fill="#10B981"/>
+            <rect x="6" y="25" width="20" height="3" rx="0.5" fill="#059669"/>
+            <polygon points="8,25 10,14 22,14 24,25" fill="#10B981"/>
+            <rect x="9" y="11" width="14" height="3" rx="0.5" fill="#059669"/>
+            <rect x="9" y="5" width="3" height="6" rx="0.5" fill="#10B981"/>
+            <rect x="14.5" y="5" width="3" height="6" rx="0.5" fill="#10B981"/>
+            <rect x="20" y="5" width="3" height="6" rx="0.5" fill="#10B981"/>
+            <rect x="7" y="3" width="18" height="2" rx="0.5" fill="#059669"/>
+          </svg>
+          <span class="text-base font-semibold tracking-tight emerald-stone-text">{{ site.company_name }}</span>
+        </a>
+        <!-- Right: CTA -->
+        <a href="mailto:{{ site.company_email }}" class="btn-primary text-sm px-6 py-2.5">
+          Get in Touch
+        </a>
+      </div>
+    </div>
+  </nav>
 
   <main>
     {{ content }}
   </main>
 
-  <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+  <!-- CDN Scripts: Lenis + GSAP + ScrollTrigger -->
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+
   <script src="{{ '/assets/js/hero-bg.js' | relative_url }}"></script>
+  <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
 </body>
 </html>

@@ -1,65 +1,58 @@
-<section id="hero" class="slide relative flex flex-col justify-center noise">
+<section id="hero" class="relative flex flex-col items-center justify-center min-h-screen noise">
   <!-- Abstract animated background -->
   <canvas id="hero-canvas" class="absolute inset-0 w-full h-full" style="pointer-events:none;" aria-hidden="true"></canvas>
 
-  <div class="relative z-10 max-w-[1400px] mx-auto px-6 md:px-10 lg:px-16 w-full">
-    <!-- Eyebrow -->
-    <div class="reveal mb-6 md:mb-8">
-      <div class="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-border bg-bg-elevated/50 backdrop-blur-sm">
-        <span class="w-2 h-2 rounded-full bg-emerald animate-pulse"></span>
-        <span class="text-xs font-medium uppercase tracking-[0.2em] text-text-secondary">{{ site.company_tagline | truncatewords: 6 }}</span>
-      </div>
+  <!-- SVG filter: turbulence + specular with animated shimmer sweep -->
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+    <filter id="emerald-stone-filter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" seed="2" result="noise" />
+      <feSpecularLighting in="noise" surfaceScale="7.2" specularConstant="1.45" specularExponent="24" lighting-color="#6EE7B7" result="specular">
+        <fePointLight x="-200" y="-200" z="300">
+          <animate attributeName="x" values="-200;600;-200" dur="3s" repeatCount="indefinite" />
+        </fePointLight>
+      </feSpecularLighting>
+      <feComposite in="specular" in2="SourceAlpha" operator="in" result="lit" />
+      <feComposite in="SourceGraphic" in2="lit" operator="arithmetic" k1="0" k2="1" k3="1.2" k4="0" />
+    </filter>
+  </svg>
+
+  <div class="relative z-10 flex flex-col items-center text-center px-6">
+    <!-- Rook Logo -->
+    <div id="hero-logo" class="mb-8">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true">
+        <rect x="4" y="28" width="24" height="3" rx="1" fill="#10B981"/>
+        <rect x="6" y="25" width="20" height="3" rx="0.5" fill="#059669"/>
+        <polygon points="8,25 10,14 22,14 24,25" fill="#10B981"/>
+        <rect x="9" y="11" width="14" height="3" rx="0.5" fill="#059669"/>
+        <rect x="9" y="5" width="3" height="6" rx="0.5" fill="#10B981"/>
+        <rect x="14.5" y="5" width="3" height="6" rx="0.5" fill="#10B981"/>
+        <rect x="20" y="5" width="3" height="6" rx="0.5" fill="#10B981"/>
+        <rect x="7" y="3" width="18" height="2" rx="0.5" fill="#059669"/>
+      </svg>
     </div>
 
-    <!-- SVG filter: turbulence + specular with animated shimmer sweep -->
-    <svg width="0" height="0" aria-hidden="true" style="position:absolute">
-      <filter id="emerald-stone-filter">
-        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" seed="2" result="noise" />
-        <feSpecularLighting in="noise" surfaceScale="7.2" specularConstant="1.45" specularExponent="24" lighting-color="#6EE7B7" result="specular">
-          <fePointLight x="-200" y="-200" z="300">
-            <animate attributeName="x" values="-200;600;-200" dur="3s" repeatCount="indefinite" />
-          </fePointLight>
-        </feSpecularLighting>
-        <feComposite in="specular" in2="SourceAlpha" operator="in" result="lit" />
-        <feComposite in="SourceGraphic" in2="lit" operator="arithmetic" k1="0" k2="1" k3="1.2" k4="0" />
-      </filter>
-    </svg>
-
-    <!-- Main headline -->
-    <h1 class="reveal">
-      <span class="block font-serif text-[clamp(2.5rem,6vw,6rem)] leading-[0.95] tracking-[-0.02em] text-text-primary">
-        We craft
-      </span>
-      <span class="block font-serif italic text-[clamp(2.5rem,6vw,6rem)] leading-[0.95] tracking-[-0.02em] emerald-stone-text">
-        software
-      </span>
-      <span class="block font-serif text-[clamp(2.5rem,6vw,6rem)] leading-[0.95] tracking-[-0.02em] text-text-primary">
-        that moves.
-      </span>
+    <!-- Company Name -->
+    <h1 id="hero-title" class="text-hero emerald-stone-text">
+      {{ site.company_name }}
     </h1>
 
-    <!-- Subtext -->
-    <div class="reveal mt-6 md:mt-8 max-w-xl">
-      <p class="text-lg md:text-xl font-light leading-relaxed text-text-secondary">
-        {{ site.company_tagline }}
-      </p>
-    </div>
+    <!-- Tagline -->
+    <p id="hero-tagline" class="mt-4 md:mt-6 text-lg md:text-xl font-light text-text-secondary tracking-wide">
+      {{ site.company_tagline }}
+    </p>
 
-    <!-- CTAs -->
-    <div class="reveal mt-6 md:mt-8 flex flex-col sm:flex-row items-start gap-4">
-      <a href="#projects" class="btn-primary text-base inline-flex items-center gap-2">
-        View Our Work
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-      </a>
-      <a href="#contact" class="btn-outline text-base inline-flex items-center gap-2">
-        Get In Touch
+    <!-- CTA -->
+    <div id="hero-cta" class="mt-8 md:mt-10">
+      <a href="mailto:{{ site.company_email }}" class="btn-primary text-base inline-flex items-center gap-2">
+        Get in Touch
       </a>
     </div>
   </div>
 
   <!-- Scroll indicator -->
-  <div class="reveal absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-    <span class="text-[11px] font-medium uppercase tracking-[0.2em] text-text-muted">Scroll</span>
-    <div class="w-px h-8 bg-gradient-to-b from-text-muted to-transparent"></div>
+  <div id="hero-scroll-indicator" class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-text-muted animate-bounce">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
   </div>
 </section>
