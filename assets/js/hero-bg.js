@@ -59,10 +59,10 @@
           baseX: baseX + jx,
           baseY: baseY + jy,
           phase: Math.random() * Math.PI * 2,
-          ampX: 1.5 + Math.random() * 2.5,
-          ampY: 1.5 + Math.random() * 2.5,
-          speedX: 0.003 + Math.random() * 0.005,
-          speedY: 0.002 + Math.random() * 0.004
+          ampX: 4 + Math.random() * 6,
+          ampY: 4 + Math.random() * 6,
+          speedX: 0.006 + Math.random() * 0.01,
+          speedY: 0.005 + Math.random() * 0.008
         });
       }
     }
