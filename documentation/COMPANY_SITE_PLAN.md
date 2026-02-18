@@ -135,7 +135,7 @@ No serif font. Single-family design.
 - **Jekyll data files** (`_data/*.yml`) for all content
 - **Liquid includes** for each section
 - **Vanilla JS** (`main.js`): Lenis init, GSAP ScrollTrigger registration, hero-to-nav animation, stat badges, project scroll switching, stats-founders animations, general reveal triggers, resize handler
-- **Canvas animation** (`hero-bg.js`): Crystalline triangulated mesh with jittered vertices, emerald-tinted facets, mouse-reactive specular highlights, pronounced vertex drift
+- **Canvas animation** (`hero-bg.js`): Faceted gemstone crystalline mesh — per-triangle pseudo-normals drive light/dark contrast between adjacent facets (emeraldDeep for dark-facing, emeraldBright for highlights), gradient fills near mouse cursor, dual-pass edge catch-lights, and phase-gated vertex glints. Emerald-only palette (5 colors). Base opacity 0.008–0.032 for subtlety; peak specular 0.22. Static frame rendered for `prefers-reduced-motion`
 - **`prefers-reduced-motion`**: All content visible immediately, no animations, no pinning, nav shown, counters at final values
 - **No IntersectionObserver** (replaced by GSAP ScrollTrigger)
 - **No hamburger menu** (traditional nav removed)

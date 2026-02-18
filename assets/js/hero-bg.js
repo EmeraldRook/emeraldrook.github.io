@@ -18,6 +18,13 @@
   var emerald = { r: 16, g: 185, b: 129 };
   var emeraldLight = { r: 52, g: 211, b: 153 };
   var emeraldDark = { r: 5, g: 150, b: 105 };
+  var emeraldDeep = { r: 4, g: 120, b: 87 };
+  var emeraldBright = { r: 110, g: 231, b: 183 };
+
+  // ── Rendering constants ──
+  var SPECULAR_RADIUS = 300;
+  var GRADIENT_ZONE_RADIUS = 200;
+  var GLINT_RADIUS = 180;
 
   function rgba(color, alpha) {
     return 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',' + alpha + ')';
@@ -77,49 +84,81 @@
         var l = k + 1;
 
         if (k < vertices.length && l < vertices.length) {
+          var triA, triB;
           // Randomize diagonal direction for variety
           if (Math.random() > 0.5) {
-            triangles.push({ a: i, b: j, c: k });
-            triangles.push({ a: j, b: l, c: k });
+            triA = { a: i, b: j, c: k };
+            triB = { a: j, b: l, c: k };
           } else {
-            triangles.push({ a: i, b: j, c: l });
-            triangles.push({ a: i, b: l, c: k });
+            triA = { a: i, b: j, c: l };
+            triB = { a: i, b: l, c: k };
           }
+          computeTriangleProperties(triA);
+          computeTriangleProperties(triB);
+          triangles.push(triA);
+          triangles.push(triB);
         }
       }
     }
   }
 
-  // ── Get triangle centroid ──
-  function centroid(tri) {
+  // ── Compute per-triangle cached properties ──
+  function computeTriangleProperties(tri) {
     var va = vertices[tri.a];
     var vb = vertices[tri.b];
     var vc = vertices[tri.c];
-    return {
-      x: (va.x + vb.x + vc.x) / 3,
-      y: (va.y + vb.y + vc.y) / 3
-    };
+
+    // 2D cross product of edges (AB x AC)
+    var abx = vb.baseX - va.baseX;
+    var aby = vb.baseY - va.baseY;
+    var acx = vc.baseX - va.baseX;
+    var acy = vc.baseY - va.baseY;
+    var cross2D = abx * acy - aby * acx;
+
+    // Average edge angle
+    var angle1 = Math.atan2(aby, abx);
+    var angle2 = Math.atan2(acy, acx);
+    var bcx = vc.baseX - vb.baseX;
+    var bcy = vc.baseY - vb.baseY;
+    var angle3 = Math.atan2(bcy, bcx);
+    var avgEdgeAngle = (angle1 + angle2 + angle3) / 3;
+
+    // Pseudo-normal: [-1, 1] — drives light/dark facet contrast
+    tri.normal = Math.sin(avgEdgeAngle * 2.7 + cross2D * 0.001);
+
+    // Deterministic hash from vertex indices for shimmer timing
+    tri.facetSeed = ((tri.a * 73 + tri.b * 137 + tri.c * 251) % 1000) / 1000;
+
+    // Color index from cross product + edge angle
+    var raw = Math.abs(cross2D * 0.0001 + avgEdgeAngle);
+    tri.colorIndex = Math.floor(raw * 10) % 3;
   }
 
-  // ── Draw triangulated mesh ──
+  // ── Draw triangulated mesh — four rendering layers ──
   function drawMesh() {
-    var specularRadius = 300;
-    var specularRadiusSq = specularRadius * specularRadius;
+    var specularRadiusSq = SPECULAR_RADIUS * SPECULAR_RADIUS;
+    var gradientZoneRadiusSq = GRADIENT_ZONE_RADIUS * GRADIENT_ZONE_RADIUS;
+    var glintRadiusSq = GLINT_RADIUS * GLINT_RADIUS;
+    var colors = [emerald, emeraldLight, emeraldDark];
 
+    // ── Layer 1 & 2 & 3: Base fills, gradient fills, and edge strokes ──
     for (var i = 0; i < triangles.length; i++) {
       var tri = triangles[i];
       var va = vertices[tri.a];
       var vb = vertices[tri.b];
       var vc = vertices[tri.c];
 
-      // Calculate centroid for specular
       var cx = (va.x + vb.x + vc.x) / 3;
       var cy = (va.y + vb.y + vc.y) / 3;
 
-      // Base emerald fill (very low opacity)
-      var baseOpacity = 0.02 + Math.sin(time * 0.001 + cx * 0.002 + cy * 0.003) * 0.01;
+      // Normal-driven brightness: range [0.4, 1.6]
+      var normalBrightness = 1.0 + tri.normal * 0.6;
 
-      // Mouse-reactive specular highlight
+      // Base opacity with shimmer
+      var shimmer = Math.sin(time * 0.003 + tri.facetSeed * 6.28) * 0.005;
+      var baseOpacity = 0.02 * normalBrightness + shimmer;
+
+      // Mouse-reactive specular
       var mdx = cx - mouseX;
       var mdy = cy - mouseY;
       var mDistSq = mdx * mdx + mdy * mdy;
@@ -127,28 +166,72 @@
 
       if (mDistSq < specularRadiusSq) {
         var mDist = Math.sqrt(mDistSq);
-        specular = (1 - mDist / specularRadius) * 0.12;
+        specular = (1 - mDist / SPECULAR_RADIUS) * 0.12;
       }
 
-      var fillOpacity = Math.min(baseOpacity + specular, 0.18);
+      var fillOpacity = Math.min(baseOpacity + specular, 0.22);
 
-      // Choose color based on position (subtle variety)
-      var colorChoice = ((i * 7) % 3);
-      var fillColor = colorChoice === 0 ? emerald : (colorChoice === 1 ? emeraldLight : emeraldDark);
+      // Color selection based on brightness tier
+      var fillColor;
+      if (normalBrightness > 1.3) {
+        fillColor = emeraldBright;
+      } else if (normalBrightness < 1.0) {
+        fillColor = emeraldDeep;
+      } else {
+        fillColor = colors[tri.colorIndex];
+      }
 
-      // Draw triangle fill
+      // Build triangle path
       ctx.beginPath();
       ctx.moveTo(va.x, va.y);
       ctx.lineTo(vb.x, vb.y);
       ctx.lineTo(vc.x, vc.y);
       ctx.closePath();
+
+      // Layer 1 — Base facet fill (flat)
       ctx.fillStyle = rgba(fillColor, fillOpacity);
       ctx.fill();
 
-      // Subtle edge lines
-      ctx.strokeStyle = rgba(emerald, 0.015 + specular * 0.3);
+      // Layer 3 — Edge catch-lights
+      // Pass 1: subtle base edge stroke on all triangles
+      var edgeOpacity = 0.004 + (normalBrightness - 0.4) * 0.013;
+      ctx.strokeStyle = rgba(emerald, edgeOpacity);
       ctx.lineWidth = 0.5;
       ctx.stroke();
+
+      // Pass 2: bright edge stroke for near-mouse bright facets
+      if (specular > 0.01 && normalBrightness > 1.0) {
+        ctx.strokeStyle = rgba(emeraldBright, specular * 0.5);
+        ctx.lineWidth = 1.0;
+        ctx.stroke();
+      }
+    }
+
+    // ── Layer 4 — Vertex glints (separate top pass) ──
+    if (mouseX > -500) {
+      for (var vi = 0; vi < vertices.length; vi++) {
+        var v = vertices[vi];
+        var vdx = v.x - mouseX;
+        var vdy = v.y - mouseY;
+        var vDistSq = vdx * vdx + vdy * vdy;
+
+        if (vDistSq < glintRadiusSq) {
+          // Phase gate: only ~35% of nearby vertices glint at any frame
+          var phase = Math.sin(time * 0.02 + v.phase * 4);
+          if (phase > 0.3) {
+            var vDist = Math.sqrt(vDistSq);
+            var proximity = 1 - vDist / GLINT_RADIUS;
+            var glintIntensity = proximity * (phase - 0.3) / 0.7;
+            var glintRadius = 1.5 + glintIntensity * 2.0;
+            var glintAlpha = Math.min(glintIntensity * 0.35, 0.35);
+
+            ctx.beginPath();
+            ctx.arc(v.x, v.y, glintRadius, 0, Math.PI * 2);
+            ctx.fillStyle = rgba(emeraldBright, glintAlpha);
+            ctx.fill();
+          }
+        }
+      }
     }
   }
 
