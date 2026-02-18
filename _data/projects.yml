@@ -1,26 +1,23 @@
-- name: "CloudSync Platform"
-  short: "CloudSync"
-  description: "Real-time data synchronization platform for distributed teams. Handles conflict resolution and offline-first workflows."
-  category: "SaaS Platform"
+- name: "Transcribber"
+  short: "Transcribber"
+  description: "AI-powered transcription app that captures meetings in real time and delivers concise, actionable summaries."
+  category: "Productivity"
   tech:
-    - React
-    - Node.js
-    - PostgreSQL
-    - WebSocket
+    - Xcode
+    - Whisper model
   link: "#"
   gradient_from: "#064e3b"
   gradient_to: "#0d9488"
   icon: "sync"
 
-- name: "PayFlow"
-  short: "PayFlow"
-  description: "Automated invoicing and payment processing SaaS. Supports multi-currency transactions and recurring billing."
-  category: "FinTech"
+- name: "Foundation Flow"
+  short: "Foundation Flow"
+  description: "End-to-end fire safety compliance platform for building assets. Web portal and mobile app with full offline audit capability."
+  category: "SaaS"
   tech:
     - Next.js
-    - Stripe API
-    - TypeScript
-    - Redis
+    - React
+    - Flutter
   link: "#"
   gradient_from: "#1e1b4b"
   gradient_to: "#6366f1"
