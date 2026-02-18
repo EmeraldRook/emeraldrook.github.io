@@ -300,6 +300,10 @@
 </head>
 <body class="bg-bg font-sans text-text-primary antialiased">
 
+  <!-- Canvas mesh + noise grain — outside hero so GSAP pin transforms don't trap them -->
+  <canvas id="hero-canvas" class="fixed inset-0 w-full h-full" style="pointer-events:none;" aria-hidden="true"></canvas>
+  <div id="hero-noise" class="fixed inset-0 noise pointer-events-none" aria-hidden="true"></div>
+
   <a href="#projects" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[60] focus:px-4 focus:py-2 focus:bg-emerald focus:text-black focus:rounded-full">
     Skip to main content
   </a>

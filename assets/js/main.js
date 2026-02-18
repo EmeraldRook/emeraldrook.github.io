@@ -387,8 +387,11 @@ document.addEventListener('DOMContentLoaded', () => {
       end: 'top top',
       scrub: true,
       onUpdate: (self) => {
+        const opacity = 1 - self.progress;
         const canvas = document.getElementById('hero-canvas');
-        if (canvas) canvas.style.opacity = 1 - self.progress;
+        const noise = document.getElementById('hero-noise');
+        if (canvas) canvas.style.opacity = opacity;
+        if (noise) noise.style.opacity = opacity;
       }
     });
   }
