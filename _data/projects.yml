@@ -37,33 +37,6 @@
   gradient_to: "#3b82f6"
   icon: "chart"
 
-- name: "SecureVault"
-  short: "SecureVault"
-  description: "Enterprise-grade secrets management solution with role-based access control and audit logging."
-  category: "Enterprise Security"
-  tech:
-    - Go
-    - AWS KMS
-    - Terraform
-    - gRPC
-  link: "#"
-  gradient_from: "#1c1917"
-  gradient_to: "#a16207"
-  icon: "shield"
-
-- name: "ShipFast CI"
-  short: "ShipFast CI"
-  description: "Opinionated CI/CD pipeline builder for startups. From commit to production in under five minutes."
-  category: "DevOps"
-  tech:
-    - Rust
-    - GitHub Actions
-    - Docker
-    - Kubernetes
-  link: "#"
-  gradient_from: "#450a0a"
-  gradient_to: "#ef4444"
-  icon: "rocket"
 
 - name: "All Work"
   short: "All Work"

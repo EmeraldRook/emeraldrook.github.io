@@ -113,7 +113,7 @@ No serif font. Single-family design.
 - Scroll progress drives active project switching with snap
 - Background gradient shifts per project (radial gradient at 40% opacity)
 - Progress dots on right edge (desktop)
-- 6 projects: CloudSync, PayFlow, DevMetrics, SecureVault, ShipFast CI, All Work
+- 4 projects: Transcribber, Foundation Flow, DevMetrics, All Work
 - Mobile: no pin, stacked with scroll reveals
 
 ### 4. Stat Corner Badges (desktop only)
