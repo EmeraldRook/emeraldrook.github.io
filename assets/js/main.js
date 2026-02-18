@@ -379,12 +379,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ── Canvas scroll fade (fixed canvas fades out as projects enter) ──
+  function initCanvasScrollFade() {
+    ScrollTrigger.create({
+      trigger: '#projects-scroll-wrapper',
+      start: 'top bottom',
+      end: 'top top',
+      scrub: true,
+      onUpdate: (self) => {
+        const canvas = document.getElementById('hero-canvas');
+        if (canvas) canvas.style.opacity = 1 - self.progress;
+      }
+    });
+  }
+
   // ── Initialize all ──
   initHeroToNav();
   initStatBadges();
   initProjectScroll();
   initStatsFounders();
   initRevealTriggers();
+  initCanvasScrollFade();
 
   // ── 8. Resize handler ──
   let resizeTimer;
