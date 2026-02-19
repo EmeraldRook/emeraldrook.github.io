@@ -117,11 +117,13 @@ No serif font. Single-family design.
 - 4 projects: Transcribber, Foundation Flow, DevMetrics, All Work
 - Mobile: no pin, stacked with scroll reveals
 
-### 4. Stat Corner Badges (desktop only)
-- 4 fixed-position badges in bottom-right corner
-- Stagger-fade in 1.5s after page load
-- Persist through hero + projects scrolling
-- Morph/dissolve as stats-founders section approaches (spread out, scale up, fade)
+### 4. Stat Sidebar Strip (desktop only)
+- Single vertical frosted-glass strip, fixed to right edge, vertically centered
+- Glassmorphism: `bg-bg-elevated/90`, `backdrop-blur-md`, `border-border/50`, `rounded-l-2xl`
+- Stats stacked vertically with `divide-y` dividers; value+suffix above, label below
+- Slide-in entrance from right (`x: 40→0`) after 1.5s delay, 0.8s duration
+- Dissolves as stats-founders section approaches (slides right + fades out, slight scale-down)
+- Respects `prefers-reduced-motion`: shown immediately with no animation
 - Canvas + noise fully faded out before this section (ScrollTrigger completes during projects)
 
 ### 5. Stats + Founders (merged section)

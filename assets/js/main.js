@@ -37,6 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.counter').forEach(el => {
       el.textContent = el.getAttribute('data-target');
     });
+    // Show stat sidebar immediately (no animation)
+    const statSidebar = document.getElementById('stat-sidebar');
+    if (statSidebar) {
+      statSidebar.classList.remove('opacity-0');
+      statSidebar.style.transform = 'translateY(-50%)';
+    }
     return;
   }
 
@@ -122,47 +128,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 0.6);
   }
 
-  // ── 4. Stat badges (desktop only) ──
+  // ── 4. Stat sidebar strip (desktop only) ──
   function initStatBadges() {
     if (isMobile) return;
 
-    const badges = document.querySelectorAll('.stat-badge-item');
+    const sidebar = document.getElementById('stat-sidebar');
     const statsSection = document.getElementById('stats-founders');
-    if (!badges.length || !statsSection) return;
+    if (!sidebar || !statsSection) return;
 
-    // Stagger-fade in after 1.5s delay
-    gsap.to(badges, {
+    // Initial state: shifted right, invisible, vertically centered
+    gsap.set(sidebar, { x: 40, opacity: 0, yPercent: -50 });
+
+    // Entrance: slide in from right after 1.5s (0.8s duration for fluid glass feel)
+    gsap.to(sidebar, {
       opacity: 1,
-      y: 0,
-      stagger: 0.15,
-      duration: 0.6,
+      x: 0,
+      yPercent: -50,
+      duration: 0.8,
       ease: 'power2.out',
       delay: 1.5,
     });
 
-    // Set initial offset
-    gsap.set(badges, { y: 20 });
-
-    // Morph/dissolve as stats-founders section approaches
+    // Dissolve as stats-founders section approaches
+    // refreshPriority -1 ensures positions recalculate after the projects pin spacer
     ScrollTrigger.create({
       trigger: statsSection,
       start: 'top 90%',
       end: 'top 30%',
       scrub: true,
+      refreshPriority: -1,
       onUpdate: (self) => {
         const progress = self.progress;
-        badges.forEach((badge, i) => {
-          // Spread outward, scale up, fade out
-          const spreadX = (i % 2 === 0 ? -1 : 1) * progress * 100;
-          const spreadY = (i < 2 ? -1 : 1) * progress * 60;
-          gsap.set(badge, {
-            opacity: 1 - progress,
-            x: spreadX,
-            y: spreadY,
-            scale: 1 + progress * 0.3,
-          });
+        gsap.set(sidebar, {
+          opacity: 1 - progress,
+          x: progress * 60,
+          scale: 1 - progress * 0.05,
+          yPercent: -50,
         });
-      }
+      },
     });
   }
 
@@ -484,8 +487,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Initialize all ──
   initHeroToNav();
-  initStatBadges();
   initProjectScroll();
+  initStatBadges();
   initStatsFounders();
   initRevealTriggers();
   initCanvasScrollFade();
