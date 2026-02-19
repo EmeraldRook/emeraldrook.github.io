@@ -37,6 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.counter').forEach(el => {
       el.textContent = el.getAttribute('data-target');
     });
+    // Show stat sidebar immediately (no animation)
+    const statSidebar = document.getElementById('stat-sidebar');
+    if (statSidebar) {
+      statSidebar.classList.remove('opacity-0');
+      statSidebar.style.transform = 'translateY(-50%)';
+    }
     return;
   }
 
@@ -122,47 +128,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 0.6);
   }
 
-  // ── 4. Stat badges (desktop only) ──
+  // ── 4. Stat sidebar strip (desktop only) ──
   function initStatBadges() {
     if (isMobile) return;
 
-    const badges = document.querySelectorAll('.stat-badge-item');
+    const sidebar = document.getElementById('stat-sidebar');
     const statsSection = document.getElementById('stats-founders');
-    if (!badges.length || !statsSection) return;
+    if (!sidebar || !statsSection) return;
 
-    // Stagger-fade in after 1.5s delay
-    gsap.to(badges, {
+    // Initial state: shifted right, invisible, vertically centered
+    gsap.set(sidebar, { x: 40, opacity: 0, yPercent: -50 });
+
+    // Entrance: slide in from right after 1.5s (0.8s duration for fluid glass feel)
+    gsap.to(sidebar, {
       opacity: 1,
-      y: 0,
-      stagger: 0.15,
-      duration: 0.6,
+      x: 0,
+      yPercent: -50,
+      duration: 0.8,
       ease: 'power2.out',
       delay: 1.5,
     });
 
-    // Set initial offset
-    gsap.set(badges, { y: 20 });
-
-    // Morph/dissolve as stats-founders section approaches
+    // Dissolve as stats-founders section approaches
+    // refreshPriority -1 ensures positions recalculate after the projects pin spacer
     ScrollTrigger.create({
       trigger: statsSection,
       start: 'top 90%',
       end: 'top 30%',
       scrub: true,
+      refreshPriority: -1,
       onUpdate: (self) => {
         const progress = self.progress;
-        badges.forEach((badge, i) => {
-          // Spread outward, scale up, fade out
-          const spreadX = (i % 2 === 0 ? -1 : 1) * progress * 100;
-          const spreadY = (i < 2 ? -1 : 1) * progress * 60;
-          gsap.set(badge, {
-            opacity: 1 - progress,
-            x: spreadX,
-            y: spreadY,
-            scale: 1 + progress * 0.3,
-          });
+        gsap.set(sidebar, {
+          opacity: 1 - progress,
+          x: progress * 60,
+          scale: 1 - progress * 0.05,
+          yPercent: -50,
         });
-      }
+      },
     });
   }
 
@@ -186,20 +189,46 @@ document.addEventListener('DOMContentLoaded', () => {
     function switchProject(newIndex) {
       if (newIndex === activeIndex || newIndex < 0 || newIndex >= items.length) return;
 
-      // Deactivate current
+      const oldPreview = previews[activeIndex];
+      const newPreview = previews[newIndex];
+
+      // Deactivate current list item (instant)
       items[activeIndex].classList.remove('is-active');
-      previews[activeIndex].classList.remove('opacity-100', 'scale-100');
-      previews[activeIndex].classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-
-      // Activate new
+      // Activate new list item (instant)
       items[newIndex].classList.add('is-active');
-      previews[newIndex].classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
-      previews[newIndex].classList.add('opacity-100', 'scale-100');
 
-      // Update background gradient
+      // Crossfade previews with GSAP
+      gsap.to(oldPreview, {
+        opacity: 0,
+        scale: 0.95,
+        duration: 0.4,
+        ease: 'power2.inOut',
+        overwrite: 'auto',
+        onComplete: () => {
+          oldPreview.classList.add('pointer-events-none');
+        },
+      });
+
+      newPreview.classList.remove('pointer-events-none');
+      gsap.to(newPreview, {
+        opacity: 1,
+        scale: 1,
+        duration: 0.4,
+        ease: 'power2.inOut',
+        overwrite: 'auto',
+      });
+
+      // Update background gradient (theme-aware)
       if (projectBg) {
-        const from = items[newIndex].getAttribute('data-gradient-from');
-        projectBg.style.background = `radial-gradient(ellipse 80% 60% at 70% 50%, ${from} 0%, transparent 70%)`;
+        const gradientAttr = document.documentElement.getAttribute('data-theme') === 'light'
+          ? 'data-gradient-from-light'
+          : 'data-gradient-from';
+        const from = items[newIndex].getAttribute(gradientAttr) || items[newIndex].getAttribute('data-gradient-from');
+        gsap.to(projectBg, {
+          background: `radial-gradient(ellipse 80% 60% at 70% 50%, ${from} 0%, transparent 70%)`,
+          duration: 0.4,
+          ease: 'power2.inOut',
+        });
       }
 
       // Update progress dots
@@ -214,6 +243,23 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       activeIndex = newIndex;
+    }
+
+    // Re-apply current project gradient when theme changes
+    function applyCurrentGradient() {
+      if (!projectBg || activeIndex < 0 || activeIndex >= items.length) return;
+      const gradientAttr = document.documentElement.getAttribute('data-theme') === 'light'
+        ? 'data-gradient-from-light'
+        : 'data-gradient-from';
+      const from = items[activeIndex].getAttribute(gradientAttr) || items[activeIndex].getAttribute('data-gradient-from');
+      projectBg.style.background = `radial-gradient(ellipse 80% 60% at 70% 50%, ${from} 0%, transparent 70%)`;
+    }
+
+    window.addEventListener('themechange', applyCurrentGradient);
+
+    // On initial load, swap gradient if light mode
+    if (document.documentElement.getAttribute('data-theme') === 'light') {
+      applyCurrentGradient();
     }
 
     if (isMobile) {
@@ -246,13 +292,13 @@ document.addEventListener('DOMContentLoaded', () => {
     ScrollTrigger.create({
       trigger: wrapper,
       start: 'top top',
-      end: () => '+=' + (numProjects * 100) + '%',
+      end: () => '+=' + ((numProjects - 1) * 80) + '%',
       pin: section,
-      scrub: 0.3,
+      scrub: 0.6,
       snap: {
         snapTo: 1 / (numProjects - 1),
-        duration: { min: 0.2, max: 0.4 },
-        ease: 'power1.inOut',
+        duration: { min: 0.3, max: 0.6 },
+        ease: 'power2.inOut',
       },
       onUpdate: (self) => {
         const progress = self.progress;
@@ -461,8 +507,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Initialize all ──
   initHeroToNav();
-  initStatBadges();
   initProjectScroll();
+  initStatBadges();
   initStatsFounders();
   initRevealTriggers();
   initCanvasScrollFade();

@@ -108,19 +108,23 @@ No serif font. Single-family design.
 ### 3. Projects (Scroll-Driven)
 - Wrapped in `#projects-scroll-wrapper` for GSAP pin distance
 - **Transparent background** (no `bg-bg`) — fixed canvas mesh shows through and fades out via ScrollTrigger as section scrolls into view
+- **Asymmetric vertical padding** on inner container: `pt-24 md:pt-28 pb-12 md:pb-16` (96px/112px top, 48px/64px bottom) — extra top padding clears the fixed nav bar (64px mobile / 80px desktop) with 32px clearance so the "Selected Work" header is never obscured when ScrollTrigger pins the section at `top: 0`
 - Split-panel layout: numbered list left, browser-frame mockup right
-- GSAP ScrollTrigger pins section, `numProjects * 100vh` pin distance
-- Scroll progress drives active project switching with snap
-- Background gradient shifts per project (radial gradient at 40% opacity)
+- GSAP ScrollTrigger pins section, `(numProjects - 1) * 80vh` pin distance (~80vh per transition)
+- Scroll progress drives active project switching with snap (`scrub: 0.6`, `power2.inOut` ease, `duration: { min: 0.3, max: 0.6 }`)
+- Project preview transitions use GSAP crossfade (opacity + scale, 0.4s `power2.inOut`) instead of instant class toggles
+- Background gradient shifts per project (radial gradient at 40% opacity, crossfaded with GSAP)
 - Progress dots on right edge (desktop)
 - 4 projects: Transcribber, Foundation Flow, DevMetrics, All Work
 - Mobile: no pin, stacked with scroll reveals
 
-### 4. Stat Corner Badges (desktop only)
-- 4 fixed-position badges in bottom-right corner
-- Stagger-fade in 1.5s after page load
-- Persist through hero + projects scrolling
-- Morph/dissolve as stats-founders section approaches (spread out, scale up, fade)
+### 4. Stat Sidebar Strip (desktop only)
+- Single vertical frosted-glass strip, fixed to right edge, vertically centered
+- Glassmorphism: `bg-bg-elevated/90`, `backdrop-blur-md`, `border-border/50`, `rounded-l-2xl`
+- Stats stacked vertically with `divide-y` dividers; value+suffix above, label below
+- Slide-in entrance from right (`x: 40→0`) after 1.5s delay, 0.8s duration
+- Dissolves as stats-founders section approaches (slides right + fades out, slight scale-down)
+- Respects `prefers-reduced-motion`: shown immediately with no animation
 - Canvas + noise fully faded out before this section (ScrollTrigger completes during projects)
 
 ### 5. Stats + Founders (merged section)
@@ -147,6 +151,72 @@ No serif font. Single-family design.
 - **No IntersectionObserver** (replaced by GSAP ScrollTrigger)
 - **No hamburger menu** (traditional nav removed)
 - **No scroll-snap** (replaced by Lenis smooth scroll + GSAP pins)
+
+---
+
+## Theme System (Light/Dark)
+
+### Approach
+CSS custom property overrides via `html[data-theme="light"]`. Tailwind v4's `@theme` directive generates CSS variables that all utility classes reference — a single override block on `html[data-theme="light"]` (specificity `0,1,1` vs `@theme`'s `:root` at `0,1,0`) flips the entire site without touching utility classes.
+
+### Light Color Palette
+| Token | Dark Value | Light Value | Notes |
+|-------|-----------|-------------|-------|
+| `--color-bg` | `#0a0a0a` | `#FAFAF9` | stone-50, warm off-white |
+| `--color-bg-elevated` | `#111111` | `#FFFFFF` | white |
+| `--color-bg-card` | `#161616` | `#FFFFFF` | white |
+| `--color-bg-card-hover` | `#1a1a1a` | `#F5F5F4` | stone-100 |
+| `--color-bg-subtle` | `#0d0d0d` | `#F5F5F4` | stone-100 |
+| `--color-emerald` | `#10B981` | `#059669` | emerald-600, 5.1:1 on light bg |
+| `--color-emerald-light` | `#34D399` | `#10B981` | emerald-500 |
+| `--color-emerald-dark` | `#059669` | `#047857` | emerald-700 |
+| `--color-text-primary` | `#f5f5f5` | `#0C0A09` | stone-950, ~19:1 contrast |
+| `--color-text-secondary` | `#a3a3a3` | `#44403C` | stone-700, ~9.5:1 |
+| `--color-text-tertiary` | `#737373` | `#78716C` | stone-500, ~4.6:1 |
+| `--color-text-muted` | `#525252` | `#A8A29E` | stone-400, decorative |
+| `--color-border` | `#262626` | `#E7E5E4` | stone-200 |
+| `--color-border-hover` | `#404040` | `#D6D3D1` | stone-300 |
+| `--color-border-subtle` | `#1a1a1a` | `#F5F5F4` | stone-100 |
+| `--color-overlay` | `rgba(0,0,0,0.6)` | `rgba(0,0,0,0.3)` | lighter |
+| `--color-emerald-glow` | `rgba(16,185,129,0.15)` | `rgba(5,150,105,0.10)` | reduced |
+| `--color-emerald-glow-strong` | `rgba(16,185,129,0.3)` | `rgba(5,150,105,0.20)` | reduced |
+
+### Toggle Mechanism
+- **Button**: Fixed pill, bottom-left corner (`z-50`), glassmorphism style (`bg-bg-elevated/90`, `backdrop-blur-md`)
+- **Icon**: Sun (dark mode) / Moon (light mode), 16px Lucide-style SVG
+- **Label**: "Light" (in dark mode) / "Dark" (in light mode)
+- **Persistence**: `localStorage.getItem('theme')` — `'light'` or absent (dark default)
+- **FOWT prevention**: Inline `<script>` in `<head>` (before Tailwind CDN) reads localStorage and sets `data-theme` attribute synchronously
+- **Transition**: `.theme-transitioning` class enables 0.4s transitions on bg/color/border only while toggling; removed after 450ms. Respects `prefers-reduced-motion` (no transition class added)
+- **CustomEvent**: `window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }))` for canvas and other listeners
+
+### Canvas Behavior in Light Mode
+- `opacityMultiplier` variable: `1.0` for dark, `2.5` for light
+- `isLightMode` boolean: tracks current theme for conditional rendering
+- Listens for `themechange` CustomEvent to update both multiplier and `isLightMode`
+- `baseOpacity` and `edgeOpacity` in the render loop are multiplied by `opacityMultiplier`
+- **Edge colors**: Dark mode uses `emerald`/`emeraldBright`; light mode uses `edgeDark` (stone-900 tone `rgb(30,27,24)`) and `edgeDarkBright` (stone-700 tone `rgb(68,64,60)`) for dark stone-colored edges that create a white crystal effect on the light background
+- Checks initial theme state on script load
+
+### Project Gradient Colors (Light Mode)
+Each project in `_data/projects.yml` has a `gradient_from_light` field with pastel hues for the radial background glow:
+| Project | Dark (`gradient_from`) | Light (`gradient_from_light`) |
+|---------|----------------------|-------------------------------|
+| Transcribber | `#064e3b` | `#a7f3d0` (emerald-200) |
+| Foundation Flow | `#1e1b4b` | `#c7d2fe` (indigo-200) |
+| DevMetrics | `#172554` | `#bfdbfe` (blue-200) |
+| All Work | `#052e16` | `#bbf7d0` (green-200) |
+
+Project items in `_includes/projects.html` carry `data-gradient-from-light` attribute. `main.js` selects the correct attribute based on current theme and re-applies on `themechange`.
+
+### Component Overrides (Light Mode)
+- **Nav glass**: `rgba(250,250,249,0.85)` background, light border color
+- **btn-outline hover**: `rgba(0,0,0,0.03)` instead of `rgba(255,255,255,0.03)`
+- **hero-gradient**: second radial uses `rgba(5,150,105,0.06)` instead of `rgba(16,185,129,0.08)`
+- **btn-primary**: `#10B981` (emerald-500) base, `#34d399` (emerald-400) hover with `box-shadow: 0 8px 30px rgba(16,185,129,0.25)` — brighter than dark mode's `--color-emerald` (`#059669`). Contrast: black on `#10B981` ~7.5:1, black on `#34d399` ~10:1 (both WCAG AAA)
+
+### Auto-Themed (No Changes Needed)
+All `bg-bg`, `text-text-*`, `border-border` utility classes inherit overridden CSS vars automatically. This includes stat sidebar glassmorphism, founder cards, stat counters, footer, `::selection`, `btn-primary` text, and SVG emerald-stone filter.
 
 ---
 
