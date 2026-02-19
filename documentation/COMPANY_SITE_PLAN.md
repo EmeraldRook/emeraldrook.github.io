@@ -116,6 +116,7 @@ No serif font. Single-family design.
 ### 3. Projects (Scroll-Driven)
 - Wrapped in `#projects-scroll-wrapper` for GSAP pin distance
 - **Transparent background** (no `bg-bg`) — fixed canvas mesh shows through and fades out via ScrollTrigger as section scrolls into view
+- **Asymmetric vertical padding** on inner container: `pt-24 md:pt-28 pb-12 md:pb-16` (96px/112px top, 48px/64px bottom) — extra top padding clears the fixed nav bar (64px mobile / 80px desktop) with 32px clearance so the "Selected Work" header is never obscured when ScrollTrigger pins the section at `top: 0`
 - Split-panel layout: numbered list left, browser-frame mockup right
 - GSAP ScrollTrigger pins section, `(numProjects - 1) * 80vh` pin distance (~80vh per transition)
 - Scroll progress drives active project switching with snap (`scrub: 0.6`, `power2.inOut` ease, `duration: { min: 0.3, max: 0.6 }`)
