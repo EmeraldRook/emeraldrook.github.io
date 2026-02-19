@@ -2,7 +2,7 @@
 
 ## Context
 
-Emerald Rook is a single-page company website deployed via GitHub Pages. Built with Jekyll, Tailwind CSS v4, GSAP + ScrollTrigger + Lenis, and vanilla JavaScript. The design direction is **Apple-keynote-meets-luxury-brand** with heavy scroll-driven animation: pinned sections, scroll-linked project switching, a hero that morphs into the nav, and persistent stat badges that transform into a full section. Typography uses a single sans family (Sora). Section count: 3 (Hero, Projects, Stats+Founders).
+Emerald Rook is a single-page company website deployed via GitHub Pages (GitHub Actions workflow). Built with Jekyll, Tailwind CSS v4 (CLI build-time compilation), GSAP 3.12.7 + ScrollTrigger + Lenis 1.1.18 (local vendor files), and vanilla JavaScript. No runtime CDN dependencies except Google Fonts. The design direction is **Apple-keynote-meets-luxury-brand** with heavy scroll-driven animation: pinned sections, scroll-linked project switching, a hero that morphs into the nav, and persistent stat badges that transform into a full section. Typography uses a single sans family (Sora). Section count: 3 (Hero, Projects, Stats+Founders).
 
 **Tagline**: "Rare by design"
 
@@ -14,9 +14,10 @@ Emerald Rook is a single-page company website deployed via GitHub Pages. Built w
 ./
   CLAUDE.md                           Project rules for Claude Code (pre-commit doc update)
   _config.yml                         Company variables (name, tagline, contact)
+  package.json                        Node deps (tailwindcss, @tailwindcss/cli) + build/watch scripts
   index.html                          Single-page entry with include directives
   _layouts/
-    default.html                      Full HTML shell, Tailwind v4 CDN, Sora font, GSAP/Lenis CDN, theme
+    default.html                      Full HTML shell, compiled CSS link, Sora font, local vendor JS, theme
   _includes/
     hero.html                         Full-height centered hero with canvas bg, logo, title, tagline, CTA
     stat-badges.html                  Fixed corner stat badges (desktop only, GSAP-animated)
@@ -28,8 +29,15 @@ Emerald Rook is a single-page company website deployed via GitHub Pages. Built w
     founders.yml                      3 founders (with initials field)
     stats.yml                         4 stat counters
   assets/
+    css/src/main.css                  Tailwind v4 source (imports, @theme, @source, component CSS)
+    css/style.css                     Compiled Tailwind output (gitignored, built by `npm run build:css`)
     js/main.js                        Lenis, GSAP ScrollTrigger, hero-to-nav, stat badges, project scroll, reveals
     js/hero-bg.js                     Crystalline triangulated mesh canvas animation
+    js/vendor/gsap.min.js             GSAP 3.12.7 (local, pinned)
+    js/vendor/ScrollTrigger.min.js    ScrollTrigger 3.12.7 (local, pinned)
+    js/vendor/lenis.min.js            Lenis 1.1.18 (local, pinned)
+  .github/
+    workflows/deploy.yml              GitHub Actions: Node build → Jekyll build → deploy to Pages
   documentation/
     COMPANY_SITE_PLAN.md              This file
     REASONING.md                      Design reasoning and decisions
@@ -138,10 +146,16 @@ No serif font. Single-family design.
 
 ## Technical Approach
 
-- **Tailwind CSS v4** via Play CDN with `@theme` directive for design tokens
-- **Google Fonts**: Sora (200–700) via `<link>` with preconnect hints
-- **GSAP 3** + **ScrollTrigger** via CDN for all scroll-driven animations
-- **Lenis** via CDN for smooth scroll, connected to GSAP ticker
+### Build Pipeline
+- **Tailwind CSS v4** compiled at build time via `@tailwindcss/cli` (v4.2.0+). Source in `assets/css/src/main.css` with `@import "tailwindcss"`, `@theme` tokens, `@source` directives pointing to `_includes/`, `_layouts/`, `index.html`, `assets/js/`. Output: `assets/css/style.css` (minified, gitignored)
+- **Build commands**: `npm run build:css` (one-shot), `npm run watch:css` (dev mode)
+- **CI/CD**: GitHub Actions workflow (`.github/workflows/deploy.yml`) — checkout → Node 20 + `npm ci` + `npm run build:css` → Ruby 3.2 + `bundle exec jekyll build` → deploy to GitHub Pages via `actions/deploy-pages@v4`. Requires Pages source set to "GitHub Actions" in repo settings
+- **Vendor JS**: GSAP 3.12.7 (`gsap.min.js`, `ScrollTrigger.min.js`) and Lenis 1.1.18 (`lenis.min.js`) served as local files from `assets/js/vendor/` — no CDN dependencies at runtime (except Google Fonts)
+
+### Runtime Stack
+- **Google Fonts**: Sora (200–700) via `<link>` with preconnect hints (kept on CDN for optimized subsetting + edge caching)
+- **GSAP 3.12.7** + **ScrollTrigger 3.12.7** for all scroll-driven animations (local vendor files)
+- **Lenis 1.1.18** for smooth scroll, connected to GSAP ticker (local vendor file)
 - **Jekyll data files** (`_data/*.yml`) for all content
 - **Liquid includes** for each section
 - **Vanilla JS** (`main.js`): Lenis init, GSAP ScrollTrigger registration, hero-to-nav animation, stat badges, project scroll switching, stats-founders animations, general reveal triggers, resize handler
@@ -186,7 +200,7 @@ CSS custom property overrides via `html[data-theme="light"]`. Tailwind v4's `@th
 - **Icon**: Sun (dark mode) / Moon (light mode), 16px Lucide-style SVG
 - **Label**: "Light" (in dark mode) / "Dark" (in light mode)
 - **Persistence**: `localStorage.getItem('theme')` — `'light'` or absent (dark default)
-- **FOWT prevention**: Inline `<script>` in `<head>` (before Tailwind CDN) reads localStorage and sets `data-theme` attribute synchronously
+- **FOWT prevention**: Inline `<script>` in `<head>` (before CSS link) reads localStorage and sets `data-theme` attribute synchronously
 - **Transition**: `.theme-transitioning` class enables 0.4s transitions on bg/color/border only while toggling; removed after 450ms. Respects `prefers-reduced-motion` (no transition class added)
 - **CustomEvent**: `window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }))` for canvas and other listeners
 
@@ -222,15 +236,28 @@ All `bg-bg`, `text-text-*`, `border-border` utility classes inherit overridden C
 
 ## Verification
 
-1. Run `bundle exec jekyll serve --livereload` locally
-2. Hero: Centered logo, "Emerald Rook" in emerald texture (Sora 200), "Rare by design", CTA, bouncing chevron
-3. Crystalline canvas: subtle mesh behind hero, mouse-reactive specular; after scrolling past hero, mouse spotlight reveals mesh at ~50% opacity in 250px radius; mouse offscreen hides mesh; scrolling back up restores full visibility seamlessly
-4. Hero-to-Nav: scroll down → elements animate out → nav fades in; scroll back reverses
-5. Projects: section pins on desktop, scrolling cycles through 6 projects with snap
-6. Stat Badges: appear bottom-right after 1.5s, morph as stats section approaches
-7. Stats+Founders: counters animate, founder cards stagger in, footer visible
-8. Test breakpoints: 375px, 768px, 1024px, 1440px
-9. `prefers-reduced-motion`: all content visible, no animations, no pinning
-10. Keyboard: Tab through all interactive elements
-11. No console errors, 60fps scroll performance
-12. All aria-labels on icon-only links
+### Build
+1. Run `npm install` then `npm run build:css` — confirm `assets/css/style.css` is generated (~39 KB minified)
+2. Inspect compiled CSS for: `@theme` tokens as `:root` vars, all utility classes (`bg-bg`, `text-text-primary`, `md:px-10`, arbitrary values like `max-w-[1400px]`), dynamic JS classes (`bg-emerald`, `scale-125`, `bg-text-muted/30`), light theme overrides, keyframes
+3. Run `bundle exec jekyll serve` + `npm run watch:css` for local dev
+
+### Visual
+4. Hero: Centered logo, "Emerald Rook" in emerald texture (Sora 200), "Rare by design", CTA, bouncing chevron
+5. Crystalline canvas: subtle mesh behind hero, mouse-reactive specular; after scrolling past hero, mouse spotlight reveals mesh at ~50% opacity in 250px radius; mouse offscreen hides mesh; scrolling back up restores full visibility seamlessly
+6. Hero-to-Nav: scroll down → elements animate out → nav fades in; scroll back reverses
+7. Projects: section pins on desktop, scrolling cycles through 6 projects with snap
+8. Stat Badges: appear bottom-right after 1.5s, morph as stats section approaches
+9. Stats+Founders: counters animate, founder cards stagger in, footer visible
+10. Test breakpoints: 375px, 768px, 1024px, 1440px
+11. `prefers-reduced-motion`: all content visible, no animations, no pinning
+
+### Network & Console
+12. DevTools Network tab: zero requests to `cdn.jsdelivr.net` (only Google Fonts CDN)
+13. DevTools Console: zero errors, zero 404s
+14. Keyboard: Tab through all interactive elements
+15. No console errors, 60fps scroll performance
+16. All aria-labels on icon-only links
+
+### CI/CD
+17. Push to feature branch — verify GitHub Actions workflow completes
+18. Deployed site works (requires Pages source set to "GitHub Actions" in repo settings)

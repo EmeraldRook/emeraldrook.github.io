@@ -1,7 +1,9 @@
 _site/
 .jekyll-cache/
 .sass-cache/
-vendor/
+/vendor/
 .bundle/
 Gemfile.lock
 documentation/dump
+node_modules/
+assets/css/style.css

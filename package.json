@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "name": "emerald-rook-site",
+  "scripts": {
+    "build:css": "npx @tailwindcss/cli -i assets/css/src/main.css -o assets/css/style.css --minify",
+    "watch:css": "npx @tailwindcss/cli -i assets/css/src/main.css -o assets/css/style.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4",
+    "@tailwindcss/cli": "^4"
+  }
+}
