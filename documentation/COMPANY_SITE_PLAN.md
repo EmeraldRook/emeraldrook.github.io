@@ -109,9 +109,10 @@ No serif font. Single-family design.
 - Wrapped in `#projects-scroll-wrapper` for GSAP pin distance
 - **Transparent background** (no `bg-bg`) — fixed canvas mesh shows through and fades out via ScrollTrigger as section scrolls into view
 - Split-panel layout: numbered list left, browser-frame mockup right
-- GSAP ScrollTrigger pins section, `numProjects * 100vh` pin distance
-- Scroll progress drives active project switching with snap
-- Background gradient shifts per project (radial gradient at 40% opacity)
+- GSAP ScrollTrigger pins section, `(numProjects - 1) * 80vh` pin distance (~80vh per transition)
+- Scroll progress drives active project switching with snap (`scrub: 0.6`, `power2.inOut` ease, `duration: { min: 0.3, max: 0.6 }`)
+- Project preview transitions use GSAP crossfade (opacity + scale, 0.4s `power2.inOut`) instead of instant class toggles
+- Background gradient shifts per project (radial gradient at 40% opacity, crossfaded with GSAP)
 - Progress dots on right edge (desktop)
 - 4 projects: Transcribber, Foundation Flow, DevMetrics, All Work
 - Mobile: no pin, stacked with scroll reveals

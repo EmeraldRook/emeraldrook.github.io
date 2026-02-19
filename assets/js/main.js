@@ -186,20 +186,43 @@ document.addEventListener('DOMContentLoaded', () => {
     function switchProject(newIndex) {
       if (newIndex === activeIndex || newIndex < 0 || newIndex >= items.length) return;
 
-      // Deactivate current
-      items[activeIndex].classList.remove('is-active');
-      previews[activeIndex].classList.remove('opacity-100', 'scale-100');
-      previews[activeIndex].classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+      const oldPreview = previews[activeIndex];
+      const newPreview = previews[newIndex];
 
-      // Activate new
+      // Deactivate current list item (instant)
+      items[activeIndex].classList.remove('is-active');
+      // Activate new list item (instant)
       items[newIndex].classList.add('is-active');
-      previews[newIndex].classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
-      previews[newIndex].classList.add('opacity-100', 'scale-100');
+
+      // Crossfade previews with GSAP
+      gsap.to(oldPreview, {
+        opacity: 0,
+        scale: 0.95,
+        duration: 0.4,
+        ease: 'power2.inOut',
+        overwrite: 'auto',
+        onComplete: () => {
+          oldPreview.classList.add('pointer-events-none');
+        },
+      });
+
+      newPreview.classList.remove('pointer-events-none');
+      gsap.to(newPreview, {
+        opacity: 1,
+        scale: 1,
+        duration: 0.4,
+        ease: 'power2.inOut',
+        overwrite: 'auto',
+      });
 
       // Update background gradient
       if (projectBg) {
         const from = items[newIndex].getAttribute('data-gradient-from');
-        projectBg.style.background = `radial-gradient(ellipse 80% 60% at 70% 50%, ${from} 0%, transparent 70%)`;
+        gsap.to(projectBg, {
+          background: `radial-gradient(ellipse 80% 60% at 70% 50%, ${from} 0%, transparent 70%)`,
+          duration: 0.4,
+          ease: 'power2.inOut',
+        });
       }
 
       // Update progress dots
@@ -246,13 +269,13 @@ document.addEventListener('DOMContentLoaded', () => {
     ScrollTrigger.create({
       trigger: wrapper,
       start: 'top top',
-      end: () => '+=' + (numProjects * 100) + '%',
+      end: () => '+=' + ((numProjects - 1) * 80) + '%',
       pin: section,
-      scrub: 0.3,
+      scrub: 0.6,
       snap: {
         snapTo: 1 / (numProjects - 1),
-        duration: { min: 0.2, max: 0.4 },
-        ease: 'power1.inOut',
+        duration: { min: 0.3, max: 0.6 },
+        ease: 'power2.inOut',
       },
       onUpdate: (self) => {
         const progress = self.progress;
