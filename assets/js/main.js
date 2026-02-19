@@ -218,9 +218,12 @@ document.addEventListener('DOMContentLoaded', () => {
         overwrite: 'auto',
       });
 
-      // Update background gradient
+      // Update background gradient (theme-aware)
       if (projectBg) {
-        const from = items[newIndex].getAttribute('data-gradient-from');
+        const gradientAttr = document.documentElement.getAttribute('data-theme') === 'light'
+          ? 'data-gradient-from-light'
+          : 'data-gradient-from';
+        const from = items[newIndex].getAttribute(gradientAttr) || items[newIndex].getAttribute('data-gradient-from');
         gsap.to(projectBg, {
           background: `radial-gradient(ellipse 80% 60% at 70% 50%, ${from} 0%, transparent 70%)`,
           duration: 0.4,
@@ -240,6 +243,23 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       activeIndex = newIndex;
+    }
+
+    // Re-apply current project gradient when theme changes
+    function applyCurrentGradient() {
+      if (!projectBg || activeIndex < 0 || activeIndex >= items.length) return;
+      const gradientAttr = document.documentElement.getAttribute('data-theme') === 'light'
+        ? 'data-gradient-from-light'
+        : 'data-gradient-from';
+      const from = items[activeIndex].getAttribute(gradientAttr) || items[activeIndex].getAttribute('data-gradient-from');
+      projectBg.style.background = `radial-gradient(ellipse 80% 60% at 70% 50%, ${from} 0%, transparent 70%)`;
+    }
+
+    window.addEventListener('themechange', applyCurrentGradient);
+
+    // On initial load, swap gradient if light mode
+    if (document.documentElement.getAttribute('data-theme') === 'light') {
+      applyCurrentGradient();
     }
 
     if (isMobile) {

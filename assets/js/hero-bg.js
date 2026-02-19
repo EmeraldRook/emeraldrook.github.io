@@ -14,12 +14,25 @@
   var animId;
   var mouseX = -1000, mouseY = -1000;
 
+  // ── Light/dark opacity multiplier ──
+  var isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
+  var opacityMultiplier = isLightMode ? 2.5 : 1.0;
+
+  window.addEventListener('themechange', function (e) {
+    isLightMode = (e.detail && e.detail.theme === 'light');
+    opacityMultiplier = isLightMode ? 2.5 : 1.0;
+  });
+
   // ── Colors ──
   var emerald = { r: 16, g: 185, b: 129 };
   var emeraldLight = { r: 52, g: 211, b: 153 };
   var emeraldDark = { r: 5, g: 150, b: 105 };
   var emeraldDeep = { r: 4, g: 120, b: 87 };
   var emeraldBright = { r: 110, g: 231, b: 183 };
+
+  // Dark edge colors for light mode (stone tones)
+  var edgeDark = { r: 30, g: 27, b: 24 };
+  var edgeDarkBright = { r: 68, g: 64, b: 60 };
 
   // ── Rendering constants ──
   var SPECULAR_RADIUS = 300;
@@ -156,7 +169,7 @@
 
       // Base opacity with shimmer
       var shimmer = Math.sin(time * 0.003 + tri.facetSeed * 6.28) * 0.005;
-      var baseOpacity = 0.02 * normalBrightness + shimmer;
+      var baseOpacity = (0.02 * normalBrightness + shimmer) * opacityMultiplier;
 
       // Mouse-reactive specular
       var mdx = cx - mouseX;
@@ -194,14 +207,14 @@
 
       // Layer 3 — Edge catch-lights
       // Pass 1: subtle base edge stroke on all triangles
-      var edgeOpacity = 0.004 + (normalBrightness - 0.4) * 0.013;
-      ctx.strokeStyle = rgba(emerald, edgeOpacity);
+      var edgeOpacity = (0.004 + (normalBrightness - 0.4) * 0.013) * opacityMultiplier;
+      ctx.strokeStyle = rgba(isLightMode ? edgeDark : emerald, edgeOpacity);
       ctx.lineWidth = 0.5;
       ctx.stroke();
 
       // Pass 2: bright edge stroke for near-mouse bright facets
       if (specular > 0.01 && normalBrightness > 1.0) {
-        ctx.strokeStyle = rgba(emeraldBright, specular * 0.5);
+        ctx.strokeStyle = rgba(isLightMode ? edgeDarkBright : emeraldBright, specular * 0.5);
         ctx.lineWidth = 1.0;
         ctx.stroke();
       }

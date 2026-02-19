@@ -29,6 +29,7 @@
              class="project-item group flex items-center justify-between py-2.5 md:py-3 cursor-pointer transition-all duration-300"
              data-index="{{ forloop.index0 }}"
              data-gradient-from="{{ project.gradient_from }}"
+             data-gradient-from-light="{{ project.gradient_from_light }}"
              data-gradient-to="{{ project.gradient_to }}">
             <div class="flex items-center gap-4 md:gap-5">
               <span class="w-6 flex items-center justify-center">
@@ -52,6 +53,7 @@
              class="project-item group flex items-center justify-between py-2.5 md:py-3 border-b border-border cursor-pointer transition-all duration-300{% if forloop.first %} is-active{% endif %}"
              data-index="{{ forloop.index0 }}"
              data-gradient-from="{{ project.gradient_from }}"
+             data-gradient-from-light="{{ project.gradient_from_light }}"
              data-gradient-to="{{ project.gradient_to }}">
             <div class="flex items-center gap-4 md:gap-5">
               <span class="text-sm font-mono text-text-muted group-hover:text-emerald transition-colors duration-300 w-6">
